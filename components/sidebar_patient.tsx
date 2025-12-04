@@ -36,7 +36,6 @@ export function Patient_Sidebar({ isOpen, setIsOpen }: SidebarProps) {
       title: "Dashboard",
       href: "/patient-dashboard",
       icon: LayoutDashboard,
-    
     },
     // {
     //   title: "Clinics",

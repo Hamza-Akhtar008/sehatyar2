@@ -11,7 +11,7 @@ import { PatientNotes } from "@/components/doctor/patient-notes";
 import { RecentPrescriptions } from "@/components/doctor/recent-prescriptions";
 import { DoctorStats } from "@/components/doctor/doctor-stats";
 
-export default function DoctorDashboardPage() {
+export default function PatientDashboardPage() {
   return (
     <div className="flex min-h-screen w-full flex-col">
       <main className="flex-1 space-y-6">
