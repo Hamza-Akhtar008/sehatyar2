@@ -1,6 +1,6 @@
 "use client";
 
-import { createIndividualDoctorProfile } from "@/lib/api/admin";
+import { createIndividualDoctorProfile } from "@/lib/api/apis";
 import { toast } from "sonner";
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
@@ -202,6 +202,7 @@ export default function AddDoctorPage() {
       email: userFields.email,
       phoneNumber: userFields.phoneNumber,
       password: userFields.password,
+       role: "individual_doctor" 
     };
     formDataToSend.append("user", JSON.stringify(userData));
 

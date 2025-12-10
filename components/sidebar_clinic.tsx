@@ -63,6 +63,10 @@ export function Clinic_Sidebar({ isOpen, setIsOpen }: SidebarProps) {
      {
       title: "Doctors",
       href: "/clinic-dashboard/doctors",
+      submenu: [
+        { title: "Doctors List", href: "/clinic-dashboard/doctors" },
+        { title: "Add Doctor", href: "/clinic-dashboard/doctors/add" },
+      ],
       icon: UserRound,
     },
     {

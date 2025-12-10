@@ -9,12 +9,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Search, Mail, Phone } from "lucide-react";
+import { Search, Mail, Phone, Trash } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useEffect, useState } from "react";
-import { getReceptionist } from "@/lib/api/admin";
+import { getReceptionist, deleteReceptionist } from "@/lib/api/apis";
 
 interface Receptionist {
   id: number;
@@ -33,6 +33,17 @@ export default function ReceptionistsPage() {
   const [receptionists, setReceptionists] = useState<Receptionist[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Added delete handler
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteReceptionist(id);
+      setReceptionists((prev) => prev.filter((receptionist) => receptionist.id !== id));
+    } catch (err) {
+      console.error("Failed to delete receptionist:", err);
+      alert("Failed to delete receptionist.");
+    }
+  };
 
   useEffect(() => {
     const fetchReceptionistsData = async () => {
@@ -141,8 +152,8 @@ export default function ReceptionistsPage() {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="ghost" size="sm">
-                        View Details
+                      <Button variant="ghost" size="icon" onClick={() => handleDelete(receptionist.id)}>
+                        <Trash className="h-4 w-4 text-red-500" />
                       </Button>
                     </TableCell>
                   </TableRow>

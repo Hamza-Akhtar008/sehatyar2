@@ -15,7 +15,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Download, Filter, MoreHorizontal, Plus, Search, X } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { getDoctors } from "@/lib/api/admin";
+import { getDoctors } from "@/lib/api/apis";
 
 export default function DoctorsPage() {
   const [doctors, setDoctors] = useState<any[]>([]);

@@ -5,9 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Search } from "lucide-react";
+import { Search, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
-import { getAppointments } from "@/lib/api/admin";
+import { getAppointments, deleteAppointment } from "@/lib/api/apis";
 
 interface Appointment {
   id: number;
@@ -37,6 +37,17 @@ export default function AppointmentsPage() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Added delete handler
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteAppointment(id);
+      setAppointments((prev) => prev.filter((appointment) => appointment.id !== id));
+    } catch (err) {
+      console.error("Failed to delete appointment:", err);
+      alert("Failed to delete appointment.");
+    }
+  };
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -147,8 +158,8 @@ export default function AppointmentsPage() {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="ghost" size="sm">
-                        View Details
+                      <Button variant="ghost" size="icon" onClick={() => handleDelete(appointment.id)}>
+                        <Trash className="h-4 w-4 text-red-500" />
                       </Button>
                     </TableCell>
                   </TableRow>

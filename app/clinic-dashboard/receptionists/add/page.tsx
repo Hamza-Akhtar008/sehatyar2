@@ -41,8 +41,8 @@ export default function AddPatientPage() {
     setLoading(true);
     try {
       const { address, ...rest } = formData;
-      await createPatientForClinic({ ...rest, role: "patient" });
-      router.push("/clinic-dashboard/patients");
+      await createPatientForClinic({ ...rest, role: "clinic_receptionist" });
+      router.push("/clinic-dashboard/receptionists");
     } catch (error) {
       console.error("Failed to create patient", error);
       toast({
@@ -65,15 +65,15 @@ export default function AddPatientPage() {
           </Link>
         </Button>
         <div>
-          <h1 className="text-2xl lg:text-3xl font-bold tracking-tight mb-2">Add Patient</h1>
-          <p className="text-muted-foreground">Register a new patient.</p>
+          <h1 className="text-2xl lg:text-3xl font-bold tracking-tight mb-2">Add Receptionist</h1>
+          <p className="text-muted-foreground">Register a new receptionist.</p>
         </div>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Patient Information</CardTitle>
-          <CardDescription>Enter the patient's details below.</CardDescription>
+          <CardTitle>Receptionist Information</CardTitle>
+          <CardDescription>Enter the receptionist's details below.</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">

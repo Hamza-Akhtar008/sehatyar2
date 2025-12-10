@@ -12,6 +12,9 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
+import { loginUser } from "@/lib/api/apis"
+import { useAuth } from "@/context/AuthContext"
+
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [showPassword, setShowPassword] = useState<boolean>(false)
@@ -19,6 +22,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState<string>("")
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
+  const { login } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -26,17 +30,35 @@ export default function LoginPage() {
     setError(null)
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-
-      // For demo purposes, simple validation
-      if (email === "admin@clinic.com" && password === "password") {
-        router.push("/")
+      const data = await loginUser({ email, password })
+      
+      // Data expected format:
+      // {
+      //   "access_token": "...",
+      //   "id": 45,
+      //   "role": "admin",
+      //   "email": "admin@gmail.com"
+      // }
+      
+      if (data && data.access_token) {
+        login(data.access_token, {
+            id: data.id,
+            email: data.email,
+            role: data.role,
+            access_token: data.access_token
+        })
+        // Redirect handled inside login()
       } else {
-        setError("Invalid email or password")
+        setError("Login failed: No access token received")
       }
-    } catch (err) {
-      setError("An error occurred. Please try again.")
+
+    } catch (err: any) {
+      console.error(err)
+       if (err.response && err.response.data && err.response.data.message) {
+         setError(err.response.data.message)
+       } else {
+         setError("An error occurred. Please try again.")
+       }
     } finally {
       setIsLoading(false)
     }

@@ -12,10 +12,10 @@ import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Download, Filter, MoreHorizontal, Plus, Search, X } from "lucide-react";
+import { Download, Filter, MoreHorizontal, Plus, Search, X, Trash } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { getDoctors } from "@/lib/api/admin";
+import { getDoctors, deleteDoctor } from "@/lib/api/apis";
 
 export default function DoctorsPage() {
   const [doctors, setDoctors] = useState<any[]>([]);
@@ -29,6 +29,17 @@ export default function DoctorsPage() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [activeFilters, setActiveFilters] = useState(0);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+  // Added delete handler
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteDoctor(id);
+      setDoctors((prev) => prev.filter((doctor) => doctor.id !== id));
+    } catch (err) {
+      console.error("Failed to delete doctor:", err);
+      alert("Failed to delete doctor.");
+    }
+  };
 
   useEffect(() => {
     const fetchDoctors = async () => {
@@ -280,30 +291,10 @@ export default function DoctorsPage() {
                         </div>
                       </TableCell>
                       <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <MoreHorizontal className="h-4 w-4" />
-                              <span className="sr-only">Actions</span>
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuItem asChild>
-                              <Link href={`/doctors/${doctor.id}`}>View profile</Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem asChild>
-                              <Link href={`/doctors/${doctor.id}/edit`}>Edit details</Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem asChild>
-                              <Link href={`/doctors/${doctor.id}/schedule`}>View schedule</Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={() => setDeleteDialogOpen(true)} className="text-red-600">
-                              Deactivate
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                        <Button variant="ghost" size="icon" onClick={() => handleDelete(doctor.id)}>
+                          <Trash className="h-4 w-4 text-red-500" />
+                          <span className="sr-only">Delete</span>
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))

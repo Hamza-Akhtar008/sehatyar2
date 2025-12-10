@@ -10,12 +10,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Plus, Search } from "lucide-react";
+import { Plus, Search, Trash } from "lucide-react";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useEffect,useState } from "react";
-import { getClinics } from "@/lib/api/admin";
+import { getClinics, deleteClinic } from "@/lib/api/apis";
 
 
 
@@ -25,6 +25,16 @@ export default function ClinicsPage() {
   const [clinics, setClinics] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteClinic(id);
+      setClinics((prev) => prev.filter((clinic) => clinic.id !== id));
+    } catch (err) {
+      console.error("Failed to delete clinic:", err);
+      alert("Failed to delete clinic.");
+    }
+  };
 
   useEffect(() => {
     const fetchClinics = async () => {
@@ -120,9 +130,9 @@ export default function ClinicsPage() {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
-                    <Link href={`/admin-dashboard/clinics/${clinic.id}`}>
-                      <Button variant="ghost" size="sm">View</Button>
-                    </Link>
+                    <Button variant="ghost" size="icon" onClick={() => handleDelete(clinic.id)}>
+                      <Trash className="h-4 w-4 text-red-500" />
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}

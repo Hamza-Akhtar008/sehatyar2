@@ -12,113 +12,77 @@ import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Download, Filter, MoreHorizontal, Plus, Search, X } from "lucide-react";
+import { Download, Filter, MoreHorizontal, Plus, Search, X, Trash } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
-
-const doctors = [
-  {
-    id: "1",
-    name: "Dr. Sarah Johnson",
-    image: "/colorful-abstract-shapes.png",
-    specialty: "Cardiology",
-    status: "Active",
-    patients: 120,
-    experience: "8 years",
-    email: "sarah.johnson@medixpro.com",
-    phone: "+1 (555) 123-4567",
-  },
-  {
-    id: "2",
-    name: "Dr. Michael Chen",
-    image: "/colorful-abstract-shapes.png",
-    specialty: "Neurology",
-    status: "Active",
-    patients: 85,
-    experience: "12 years",
-    email: "michael.chen@medixpro.com",
-    phone: "+1 (555) 234-5678",
-  },
-  {
-    id: "3",
-    name: "Dr. Lisa Patel",
-    image: "/user-3.png",
-    specialty: "Pediatrics",
-    status: "On Leave",
-    patients: 150,
-    experience: "10 years",
-    email: "lisa.patel@medixpro.com",
-    phone: "+1 (555) 345-6789",
-  },
-  {
-    id: "4",
-    name: "Dr. James Wilson",
-    image: "/user-3.png",
-    specialty: "Orthopedics",
-    status: "Active",
-    patients: 95,
-    experience: "15 years",
-    email: "james.wilson@medixpro.com",
-    phone: "+1 (555) 456-7890",
-  },
-  {
-    id: "5",
-    name: "Dr. Emily Rodriguez",
-    image: "/user-3.png",
-    specialty: "Dermatology",
-    status: "Active",
-    patients: 110,
-    experience: "7 years",
-    email: "emily.rodriguez@medixpro.com",
-    phone: "+1 (555) 567-8901",
-  },
-  {
-    id: "6",
-    name: "Dr. Robert Kim",
-    image: "/user-3.png",
-    specialty: "Psychiatry",
-    status: "Inactive",
-    patients: 75,
-    experience: "9 years",
-    email: "robert.kim@medixpro.com",
-    phone: "+1 (555) 678-9012",
-  },
-];
-
-// Extract unique specialties and statuses for filters
-const specialties = [...new Set(doctors.map((doctor) => doctor.specialty))];
-const statuses = [...new Set(doctors.map((doctor) => doctor.status))];
-const experienceRanges = ["0-5 years", "5-10 years", "10-15 years", "15+ years"];
+import { useState, useEffect } from "react";
+import { getDoctorsByClinic, deleteDoctor } from "@/lib/api/apis";
 
 export default function DoctorsPage() {
+  const [doctors, setDoctors] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSpecialties, setSelectedSpecialties] = useState<string[]>([]);
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
-  const [selectedExperience, setSelectedExperience] = useState<string[]>([]);
+  // Experience filter logic might need adjustment based on data format, keeping simplistic for now or removing if complex to map
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [activeFilters, setActiveFilters] = useState(0);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
+  // Added delete handler
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteDoctor(id);
+      setDoctors((prev) => prev.filter((doctor) => doctor.id !== id));
+    } catch (err) {
+      console.error("Failed to delete doctor:", err);
+      alert("Failed to delete doctor.");
+    }
+  };
+
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      try {
+        setIsLoading(true);
+        const data = await getDoctorsByClinic();
+        setDoctors(data);
+      } catch (err) {
+        console.error(err);
+        setError("Failed to fetch doctors");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchDoctors();
+  }, []);
+
+  // Derived data for filters
+  const uniqueSpecialties = Array.from(new Set(doctors.flatMap((d) => d.primarySpecialization || [])));
+  const uniqueStatuses = ["Active", "Inactive"]; // specific set based on boolean
+
   // Filter doctors based on search query and selected filters
   const filteredDoctors = doctors.filter((doctor) => {
+    const name = doctor.user?.fullName || "";
+    const email = doctor.user?.email || "";
+    const specialty = doctor.primarySpecialization?.[0] || ""; // Check first specialty for simple search
+    const allSpecialties = doctor.primarySpecialization || [];
+    const status = doctor.isActive ? "Active" : "Inactive";
+    
     // Search filter
-    const matchesSearch = searchQuery === "" || doctor.name.toLowerCase().includes(searchQuery.toLowerCase()) || doctor.specialty.toLowerCase().includes(searchQuery.toLowerCase()) || doctor.email.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = 
+      searchQuery === "" || 
+      name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      allSpecialties.some((s: string) => s.toLowerCase().includes(searchQuery.toLowerCase()));
 
     // Specialty filter
-    const matchesSpecialty = selectedSpecialties.length === 0 || selectedSpecialties.includes(doctor.specialty);
+    const matchesSpecialty = selectedSpecialties.length === 0 || allSpecialties.some((s: string) => selectedSpecialties.includes(s));
 
     // Status filter
-    const matchesStatus = selectedStatuses.length === 0 || selectedStatuses.includes(doctor.status);
+    const matchesStatus = selectedStatuses.length === 0 || selectedStatuses.includes(status);
 
-    // Experience filter
-    const matchesExperience =
-      selectedExperience.length === 0 ||
-      (selectedExperience.includes("0-5 years") && Number.parseInt(doctor.experience) < 5) ||
-      (selectedExperience.includes("5-10 years") && Number.parseInt(doctor.experience) >= 5 && Number.parseInt(doctor.experience) < 10) ||
-      (selectedExperience.includes("10-15 years") && Number.parseInt(doctor.experience) >= 10 && Number.parseInt(doctor.experience) < 15) ||
-      (selectedExperience.includes("15+ years") && Number.parseInt(doctor.experience) >= 15);
-
-    return matchesSearch && matchesSpecialty && matchesStatus && matchesExperience;
+    return matchesSearch && matchesSpecialty && matchesStatus;
   });
 
   // Toggle specialty filter
@@ -131,23 +95,16 @@ export default function DoctorsPage() {
     setSelectedStatuses((prev) => (prev.includes(status) ? prev.filter((s) => s !== status) : [...prev, status]));
   };
 
-  // Toggle experience filter
-  const toggleExperience = (experience: string) => {
-    setSelectedExperience((prev) => (prev.includes(experience) ? prev.filter((e) => e !== experience) : [...prev, experience]));
-  };
-
   // Clear all filters
   const clearFilters = () => {
     setSelectedSpecialties([]);
     setSelectedStatuses([]);
-    setSelectedExperience([]);
     setActiveFilters(0);
   };
 
   // Apply filters
   const applyFilters = () => {
-    const totalActiveFilters = selectedSpecialties.length + selectedStatuses.length + selectedExperience.length;
-
+    const totalActiveFilters = selectedSpecialties.length + selectedStatuses.length;
     setActiveFilters(totalActiveFilters);
     setIsFilterOpen(false);
   };
@@ -200,7 +157,7 @@ export default function DoctorsPage() {
                     <div className="space-y-2">
                       <h5 className="text-sm font-medium">Specialty</h5>
                       <div className="grid grid-cols-1 gap-2">
-                        {specialties.map((specialty) => (
+                        {uniqueSpecialties.map((specialty: any) => (
                           <div key={specialty} className="flex items-center space-x-2">
                             <Checkbox id={`specialty-${specialty}`} checked={selectedSpecialties.includes(specialty)} onCheckedChange={() => toggleSpecialty(specialty)} />
                             <Label htmlFor={`specialty-${specialty}`} className="text-sm font-normal">
@@ -214,25 +171,11 @@ export default function DoctorsPage() {
                     <div className="space-y-2">
                       <h5 className="text-sm font-medium">Status</h5>
                       <div className="grid grid-cols-1 gap-2">
-                        {statuses.map((status) => (
+                        {uniqueStatuses.map((status) => (
                           <div key={status} className="flex items-center space-x-2">
                             <Checkbox id={`status-${status}`} checked={selectedStatuses.includes(status)} onCheckedChange={() => toggleStatus(status)} />
                             <Label htmlFor={`status-${status}`} className="text-sm font-normal">
                               {status}
-                            </Label>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    <Separator />
-                    <div className="space-y-2">
-                      <h5 className="text-sm font-medium">Experience</h5>
-                      <div className="grid grid-cols-1 gap-2">
-                        {experienceRanges.map((range) => (
-                          <div key={range} className="flex items-center space-x-2">
-                            <Checkbox id={`experience-${range}`} checked={selectedExperience.includes(range)} onCheckedChange={() => toggleExperience(range)} />
-                            <Label htmlFor={`experience-${range}`} className="text-sm font-normal">
-                              {range}
                             </Label>
                           </div>
                         ))}
@@ -282,18 +225,6 @@ export default function DoctorsPage() {
                     />
                   </Badge>
                 ))}
-                {selectedExperience.map((exp) => (
-                  <Badge key={`badge-exp-${exp}`} variant="outline" className="flex items-center gap-1">
-                    {exp}
-                    <X
-                      className="h-3 w-3 cursor-pointer"
-                      onClick={() => {
-                        toggleExperience(exp);
-                        setActiveFilters((prev) => prev - 1);
-                      }}
-                    />
-                  </Badge>
-                ))}
                 {activeFilters > 0 && (
                   <Button variant="ghost" size="sm" onClick={clearFilters} className="h-6 px-2 text-xs">
                     Clear all
@@ -307,73 +238,63 @@ export default function DoctorsPage() {
                   <TableHead>Name</TableHead>
                   <TableHead>Specialty</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead className="table-cell">Patients</TableHead>
                   <TableHead className="table-cell">Experience</TableHead>
                   <TableHead className="table-cell">Contact</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody className="whitespace-nowrap">
-                {filteredDoctors.length === 0 ? (
+                {isLoading ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="h-24 text-center">
+                        Loading doctors...
+                      </TableCell>
+                    </TableRow>
+                ) : error ? (
+                    <TableRow>
+                        <TableCell colSpan={6} className="h-24 text-center text-red-500">
+                          {error}
+                        </TableCell>
+                    </TableRow>
+                ) : filteredDoctors.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="h-24 text-center">
+                    <TableCell colSpan={6} className="h-24 text-center">
                       No doctors found matching your filters.
                     </TableCell>
                   </TableRow>
                 ) : (
                   filteredDoctors.map((doctor) => (
                     <TableRow key={doctor.id}>
-                      <TableCell>
+                      <TableCell className="max-w-[200px]">
                         <div className="flex items-center gap-3">
                           <Avatar>
-                            <AvatarImage src={doctor.image || "/user-2.png"} alt={doctor.name} />
-                            <AvatarFallback>{doctor.name.charAt(0)}</AvatarFallback>
+                            <AvatarImage src={doctor.profilePic || "/user-2.png"} alt={doctor.user?.fullName} />
+                            <AvatarFallback>{doctor.user?.fullName?.charAt(0)}</AvatarFallback>
                           </Avatar>
-                          <div>
-                            <p className="font-medium">{doctor.name}</p>
-                            <p className="text-sm text-muted-foreground md:hidden">{doctor.specialty}</p>
+                          <div className="overflow-hidden">
+                            <p className="font-medium truncate" title={doctor.user?.fullName}>{doctor.user?.fullName}</p>
+                            <p className="text-sm text-muted-foreground md:hidden truncate">{doctor.primarySpecialization?.[0]}</p>
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell className="table-cell">{doctor.specialty}</TableCell>
+                      <TableCell className="table-cell max-w-[200px] truncate" title={doctor.primarySpecialization?.join(", ")}>{doctor.primarySpecialization?.join(", ")}</TableCell>
                       <TableCell>
-                        <Badge variant={doctor.status === "Active" ? "default" : doctor.status === "On Leave" ? "outline" : "secondary"} className={doctor.status === "Active" ? "bg-green-500 text-neutral-700" : doctor.status === "On Leave" ? "bg-amber-500 text-neutral-700" : "bg-red-500 text-neutral-50"}>
-                          {doctor.status}
+                        <Badge variant={doctor.isActive ? "default" : "secondary"}>
+                          {doctor.isActive ? "Active" : "Inactive"}
                         </Badge>
                       </TableCell>
-                      <TableCell className="table-cell">{doctor.patients}</TableCell>
-                      <TableCell className="table-cell">{doctor.experience}</TableCell>
-                      <TableCell className="table-cell">
-                        <div className="text-sm">
-                          <p className="mb-1">{doctor.email}</p>
-                          <p className="text-muted-foreground">{doctor.phone}</p>
+                      <TableCell className="table-cell">{doctor.yearsOfExperience} years</TableCell>
+                      <TableCell className="table-cell max-w-[200px]">
+                        <div className="text-sm overflow-hidden">
+                          <p className="mb-1 truncate" title={doctor.user?.email}>{doctor.user?.email}</p>
+                          <p className="text-muted-foreground truncate">{doctor.user?.phoneNumber}</p>
                         </div>
                       </TableCell>
                       <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <MoreHorizontal className="h-4 w-4" />
-                              <span className="sr-only">Actions</span>
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuItem asChild>
-                              <Link href={`/doctors/${doctor.id}`}>View profile</Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem asChild>
-                              <Link href={`/doctors/${doctor.id}/edit`}>Edit details</Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem asChild>
-                              <Link href={`/doctors/${doctor.id}/schedule`}>View schedule</Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={() => setDeleteDialogOpen(true)} className="text-red-600">
-                              Deactivate
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                        <Button variant="ghost" size="icon" onClick={() => handleDelete(doctor.id)}>
+                          <Trash className="h-4 w-4 text-red-500" />
+                          <span className="sr-only">Delete</span>
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))

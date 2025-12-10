@@ -9,12 +9,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Search, Mail, Phone } from "lucide-react";
+import { Search, Mail, Phone, Trash } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useEffect, useState } from "react";
-import { getPatients } from "@/lib/api/admin";
+import { getPatients, deletePatient } from "@/lib/api/apis";
 
 interface Patient {
   id: number;
@@ -33,6 +33,17 @@ export default function ReceptionistsPage() {
   const [patients, setPatients] = useState<Patient[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Added delete handler
+  const handleDelete = async (id: number) => {
+    try {
+      await deletePatient(id);
+      setPatients((prev) => prev.filter((patient) => patient.id !== id));
+    } catch (err) {
+      console.error("Failed to delete patient:", err);
+      alert("Failed to delete patient.");
+    }
+  };
 
   useEffect(() => {
     const fetchPatientsData = async () => {
@@ -141,8 +152,8 @@ export default function ReceptionistsPage() {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="ghost" size="sm">
-                        View Details
+                      <Button variant="ghost" size="icon" onClick={() => handleDelete(patient.id)}>
+                        <Trash className="h-4 w-4 text-red-500" />
                       </Button>
                     </TableCell>
                   </TableRow>

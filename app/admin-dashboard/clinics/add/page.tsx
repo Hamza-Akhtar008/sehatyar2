@@ -18,7 +18,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { createClinic } from "@/lib/api/admin";
+import { createClinic } from "@/lib/api/apis";
 
 const formSchema = z.object({
   name: z.string().min(2, {
