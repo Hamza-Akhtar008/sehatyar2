@@ -1,19 +1,22 @@
 "use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/context/AuthContext";
 import { useMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
+import { UserRole } from "@/lib/types";
 import logoLight from "@/public/Group_3016.svg";
 import logoDark from "@/public/Group_3015.svg";
 
-import { Ambulance, BarChart3, Bed, Building2, Calendar, Calendar1, CheckCircle2, Droplet, FileText, Grid, HelpCircle, LayoutDashboard, Mail, MessageCircle, MessageSquare, Package, Pill, Receipt, Settings, ShieldCheck, Star, UserCog, UserRound, Users, X } from "lucide-react";
+import { BarChart3, Calendar, Calendar1, LayoutDashboard, MessageCircle, Settings, Star, UserRound, X } from "lucide-react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import AnimateHeight from "react-animate-height";
+
 interface SidebarProps {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
@@ -31,156 +34,50 @@ export function Doctor_Sidebar({ isOpen, setIsOpen }: SidebarProps) {
   const isMobile = useMobile();
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
   const { theme, setTheme } = useTheme();
-  const sidebarItems: SidebarItem[] = [
-    {
-      title: "Dashboard",
-      href: "/doctor-dashboard",
-      icon: LayoutDashboard,
-    
-    },
-   
-    // {
-    //   title: "Doctors",
-    //   href: "/doctors",
-    //   icon: Users,
-    //   submenu: [
-    //     { title: "Doctors List", href: "/doctor-dashboard/doctors" },
-    
-    //   ],
-    // },
-    //  {
-    //   title: "Individual Doctors",
-    //   href: "/doctors",
-    //   icon: Users,
-    //   submenu: [
-    //     { title: "Doctors List", href: "/doctor-dashboard/doctors" },
-    //     { title: "Add Doctor", href: "/doctor-dashboard/doctors/add" },
+  const { user } = useAuth();
 
-    
-    //   ],
-    // },
-    {
-      title: "Receptionist",
-      href: "/doctor-dashboard/receptionists",
-      icon: UserRound,
-    },
-    {
-      title: "Patients",
-      href: "/doctor-dashboard/patients",
-      icon: UserRound,
-    },
-    {
+  // Determine if user is an individual doctor (only individual doctors have receptionists)
+  const isIndividualDoctor = user?.role === UserRole.INDIVIDUALDOCTOR;
+
+  // Build sidebar items based on user role
+  const sidebarItems: SidebarItem[] = useMemo(() => {
+    const items: SidebarItem[] = [
+      {
+        title: "Dashboard",
+        href: "/doctor-dashboard",
+        icon: LayoutDashboard,
+      },
+    ];
+
+    // Add Receptionist menu only for individual_doctor
+    if (isIndividualDoctor) {
+      items.push({
+        title: "Receptionist",
+        href: "/doctor-dashboard/receptionist",
+        icon: UserRound,
+      });
+    }
+
+    // Appointments - for all doctor roles
+    items.push({
       title: "Appointments",
       href: "/doctor-dashboard/appointments",
       icon: Calendar,
       submenu: [
         { title: "All Appointments", href: "/doctor-dashboard/appointments" },
-        // { title: "Add Appointment", href: "/appointments/add" },
         { title: "Calendar View", href: "/doctor-dashboard/appointments/calendar" },
-        // { title: "Appointment Requests", href: "/appointments/requests" },
       ],
-    },
-    // {
-    //   title: "Prescriptions",
-    //   href: "/prescriptions",
-    //   icon: Pill,
-    //   submenu: [
-    //     { title: "All Prescriptions", href: "/prescriptions" },
-    //     { title: "Create Prescription", href: "/prescriptions/create" },
-    //     { title: "Medicine Templates", href: "/prescriptions/templates" },
-    //   ],
-    // },
-    // {
-    //   title: "Ambulance",
-    //   href: "/ambulance",
-    //   icon: Ambulance,
-    //   submenu: [
-    //     { title: "Ambulance Call List", href: "/ambulance/calls" },
-    //     { title: "Ambulance List", href: "/ambulance/list" },
-    //     { title: "Ambulance Details", href: "/ambulance/details" },
-    //   ],
-    // },
-    // {
-    //   title: "Pharmacy",
-    //   href: "/pharmacy/medicines",
-    //   icon: Pill,
-    // },
-    // {
-    //   title: "Blood Bank",
-    //   href: "/blood-bank",
-    //   icon: Droplet,
-    //   submenu: [
-    //     { title: "Blood Stock", href: "/blood-bank/stock" },
-    //     { title: "Blood Donor", href: "/blood-bank/donors" },
-    //     { title: "Blood Issued", href: "/blood-bank/issued" },
-    //     { title: "Add Blood Unit", href: "/blood-bank/add" },
-    //     { title: "Issue Blood", href: "/blood-bank/issue" },
-    //   ],
-    // },
-    // {
-    //   title: "Billing",
-    //   href: "/doctor-dashboard/billing",
-    //   icon: Receipt,
-    //   submenu: [
-    //     { title: "Invoices List", href: "/doctor-dashboard/billing" },
-    //     { title: "Create Invoice", href: "/doctor-dashboard/billing/create" },
-    //     { title: "Payments History", href: "/doctor-dashboard/billing/payments" },
-    //     // { title: "Insurance Claims", href: "/billing/insurance" },
-    //   ],
-    // },
-    // {
-    //   title: "Departments",
-    //   href: "/departments",
-    //   icon: Building2,
-    //   submenu: [
-    //     { title: "Department List", href: "/departments" },
-    //     { title: "Add Department", href: "/departments/add" },
-    //     { title: "Services Offered", href: "/departments/services" },
-    //   ],
-    // },
-    // {
-    //   title: "Inventory",
-    //   href: "/inventory",
-    //   icon: Package,
-    //   submenu: [
-    //     { title: "Inventory List", href: "/inventory" },
-    //     { title: "Add Item", href: "/inventory/add" },
-    //     { title: "Stock Alerts", href: "/inventory/alerts" },
-    //     { title: "Suppliers List", href: "/inventory/suppliers" },
-    //   ],
-    // },
-    // {
-    //   title: "Staff",
-    //   href: "/staff",
-    //   icon: UserCog,
-    //   submenu: [
-    //     { title: "All Staff", href: "/staff" },
-    //     { title: "Add Staff", href: "/staff/add" },
-    //     { title: "Roles & Permissions", href: "/staff/roles" },
-    //     { title: "Attendance", href: "/staff/attendance" },
-    //   ],
-    // },
-    // {
-    //   title: "Records",
-    //   href: "/records",
-    //   icon: FileText,
-    //   submenu: [
-    //     { title: "Birth Records", href: "/records/birth" },
-    //     { title: "Death Records", href: "/records/death" },
-    //   ],
-    // },
-    // {
-    //   title: "Room Allotment",
-    //   href: "/rooms",
-    //   icon: Bed,
-    //   submenu: [
-    //     { title: "Alloted Rooms", href: "/rooms/alloted" },
-    //     { title: "New Allotment", href: "/rooms/new" },
-    //     { title: "Rooms by Department", href: "/rooms/departments" },
-    //     { title: "Add New Room", href: "/rooms/add" },
-    //   ],
-    // },
-    {
+    });
+
+    // Patients - for all doctor roles
+    items.push({
+      title: "Patients",
+      href: "/doctor-dashboard/patients",
+      icon: UserRound,
+    });
+
+    // Reviews - for all doctor roles
+    items.push({
       title: "Reviews",
       href: "/doctor-dashboard/reviews",
       icon: Star,
@@ -188,13 +85,10 @@ export function Doctor_Sidebar({ isOpen, setIsOpen }: SidebarProps) {
         { title: "Doctor Reviews", href: "/doctor-dashboard/reviews/doctors" },
         { title: "Patient Reviews", href: "/doctor-dashboard/reviews/patients" },
       ],
-    },
-    // {
-    //   title: "Feedback",
-    //   href: "/feedback",
-    //   icon: MessageSquare,
-    // },
-    {
+    });
+
+    // Reports - for all doctor roles
+    items.push({
       title: "Reports",
       href: "/doctor-dashboard/reports",
       icon: BarChart3,
@@ -202,11 +96,12 @@ export function Doctor_Sidebar({ isOpen, setIsOpen }: SidebarProps) {
         { title: "Overview", href: "/doctor-dashboard/reports" },
         { title: "Appointment Reports", href: "/doctor-dashboard/reports/appointments" },
         { title: "Financial Reports", href: "/doctor-dashboard/reports/financial" },
-        // { title: "Inventory Reports", href: "/reports/inventory" },
         { title: "Patient Visit Reports", href: "/doctor-dashboard/reports/patients" },
       ],
-    },
-    {
+    });
+
+    // Settings - for all doctor roles
+    items.push({
       title: "Settings",
       href: "/doctor-dashboard/settings",
       icon: Settings,
@@ -216,55 +111,31 @@ export function Doctor_Sidebar({ isOpen, setIsOpen }: SidebarProps) {
         { title: "Working Hours", href: "/doctor-dashboard/settings/hours" },
         { title: "Integrations", href: "/doctor-dashboard/settings/integrations" },
       ],
-    },
-    // {
-    //   title: "Authentication",
-    //   href: "/auth",
-    //   icon: ShieldCheck,
-    //   submenu: [
-    //     { title: "Login", href: "/auth/login" },
-    //     { title: "Register", href: "/auth/register" },
-    //     { title: "Forgot Password", href: "/auth/forgot-password" },
-    //     { title: "Profile Settings", href: "/profile" },
-    //   ],
-    // },
+    });
 
-    {
+    // Calendar - for all doctor roles
+    items.push({
       title: "Calendar",
       href: "/doctor-dashboard/calendar",
       icon: Calendar1,
-    },
-    // {
-    //   title: "Tasks",
-    //   href: "/tasks",
-    //   icon: CheckCircle2,
-    // },
-    {
+    });
+
+    // Contacts - for all doctor roles
+    items.push({
       title: "Contacts",
       href: "/doctor-dashboard/contact",
       icon: UserRound,
-    },
-    // {
-    //   title: "Email",
-    //   href: "/email",
-    //   icon: Mail,
-    // },
-    {
+    });
+
+    // Chat - for all doctor roles
+    items.push({
       title: "Chat",
       href: "/doctor-dashboard/chat",
       icon: MessageCircle,
-    },
-    // {
-    //   title: "Support",
-    //   href: "/support",
-    //   icon: HelpCircle,
-    // },
-    // {
-    //   title: "Widgets",
-    //   href: "/widgets",
-    //   icon: Grid,
-    // },
-  ];
+    });
+
+    return items;
+  }, [isIndividualDoctor]);
 
   const toggleSubmenu = (title: string) => {
     if (openSubmenu === title) {
@@ -279,6 +150,7 @@ export function Doctor_Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     "-translate-x-full": !isOpen,
     "translate-x-0 ": isOpen,
   });
+
   useEffect(() => {
     const foundItem = sidebarItems.find((item) => {
       if (item.submenu) {
@@ -289,7 +161,7 @@ export function Doctor_Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     if (foundItem?.submenu) {
       setOpenSubmenu(foundItem.title);
     }
-  }, []);
+  }, [sidebarItems, pathname]);
   return (
     <aside className={sidebarClasses}>
       <div className="flex py-3 xl:py-3.5 items-center justify-between px-4">

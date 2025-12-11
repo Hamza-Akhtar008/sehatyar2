@@ -15,143 +15,115 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Download, Filter, MoreHorizontal, Plus, Search, X } from "lucide-react";
+import { getPatientsForDoctor } from "@/lib/api/apis";
+import { Download, Filter, Loader2, MoreHorizontal, Plus, Search, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-// Sample patient data
-const patientsData = [
-  {
-    id: "1",
-    name: "John Smith",
-    image: "/colorful-abstract-shapes.png",
-    age: 45,
-    gender: "Male",
-    status: "Active",
-    lastVisit: "2023-06-15",
-    condition: "Hypertension",
-    doctor: "Dr. Sarah Johnson",
-    email: "john.smith@example.com",
-    phone: "+1 (555) 123-4567",
-  },
-  {
-    id: "2",
-    name: "Emily Davis",
-    image: "/colorful-abstract-shapes.png",
-    age: 32,
-    gender: "Female",
-    status: "Active",
-    lastVisit: "2023-07-02",
-    condition: "Diabetes Type 2",
-    doctor: "Dr. Michael Chen",
-    email: "emily.davis@example.com",
-    phone: "+1 (555) 234-5678",
-  },
-  {
-    id: "3",
-    name: "Robert Wilson",
-    image: "/user-3.png",
-    age: 58,
-    gender: "Male",
-    status: "Inactive",
-    lastVisit: "2023-05-20",
-    condition: "Arthritis",
-    doctor: "Dr. Lisa Patel",
-    email: "robert.wilson@example.com",
-    phone: "+1 (555) 345-6789",
-  },
-  {
-    id: "4",
-    name: "Jessica Brown",
-    image: "/user-3.png",
-    age: 27,
-    gender: "Female",
-    status: "Active",
-    lastVisit: "2023-07-10",
-    condition: "Asthma",
-    doctor: "Dr. James Wilson",
-    email: "jessica.brown@example.com",
-    phone: "+1 (555) 456-7890",
-  },
-  {
-    id: "5",
-    name: "Michael Johnson",
-    image: "/user-3.png",
-    age: 41,
-    gender: "Male",
-    status: "Active",
-    lastVisit: "2023-06-28",
-    condition: "Migraine",
-    doctor: "Dr. Emily Rodriguez",
-    email: "michael.johnson@example.com",
-    phone: "+1 (555) 567-8901",
-  },
-  {
-    id: "6",
-    name: "Sarah Thompson",
-    image: "/user-3.png",
-    age: 63,
-    gender: "Female",
-    status: "Active",
-    lastVisit: "2023-07-05",
-    condition: "Osteoporosis",
-    doctor: "Dr. Robert Kim",
-    email: "sarah.thompson@example.com",
-    phone: "+1 (555) 678-9012",
-  },
-  {
-    id: "7",
-    name: "David Lee",
-    image: "/user-3.png",
-    age: 52,
-    gender: "Male",
-    status: "Inactive",
-    lastVisit: "2023-04-18",
-    condition: "COPD",
-    doctor: "Dr. Jennifer Martinez",
-    email: "david.lee@example.com",
-    phone: "+1 (555) 789-0123",
-  },
-  {
-    id: "8",
-    name: "Amanda Clark",
-    image: "/user-3.png",
-    age: 36,
-    gender: "Female",
-    status: "Active",
-    lastVisit: "2023-07-08",
-    condition: "Anxiety",
-    doctor: "Dr. Thomas Wright",
-    email: "amanda.clark@example.com",
-    phone: "+1 (555) 890-1234",
-  },
-  {
-    id: "9",
-    name: "James Rodriguez",
-    image: "/user-3.png",
-    age: 70,
-    gender: "Male",
-    status: "Active",
-    lastVisit: "2023-06-30",
-    condition: "Coronary Artery Disease",
-    doctor: "Dr. Sarah Johnson",
-    email: "james.rodriguez@example.com",
-    phone: "+1 (555) 901-2345",
-  },
-  {
-    id: "10",
-    name: "Lisa Chen",
-    image: "/user-3.png",
-    age: 29,
-    gender: "Female",
-    status: "Active",
-    lastVisit: "2023-07-12",
-    condition: "Allergies",
-    doctor: "Dr. Michael Chen",
-    email: "lisa.chen@example.com",
-    phone: "+1 (555) 012-3456",
-  },
-];
+// API Response types
+interface PatientProfile {
+  id: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  profilePic: string | null;
+  dateOfBirth: string | null;
+  age: string | null;
+  bloodGroup: string | null;
+  userId: number;
+  height: string | null;
+  weight: string | null;
+  allergies: string[] | null;
+  emergencyContact: string | null;
+  previousReportsFiles: string | null;
+}
+
+interface ApiPatient {
+  id: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  fullName: string;
+  gender: string | null;
+  country: string;
+  city: string;
+  email: string;
+  phoneNumber: string;
+  password: string;
+  role: string;
+  patientProfile: PatientProfile | null;
+  isDeleted: boolean;
+  socketId: string | null;
+  isOnline: boolean;
+  clinicId: number | null;
+}
+
+// UI Patient type
+interface Patient {
+  id: string;
+  name: string;
+  image: string;
+  age: number;
+  gender: string;
+  status: string;
+  lastVisit: string;
+  condition: string;
+
+  email: string;
+  phone: string;
+  bloodGroup: string;
+  city: string;
+  country: string;
+  allergies: string[];
+}
+
+// Transform API response to UI format
+const transformPatient = (apiData: ApiPatient): Patient => {
+  const calculateAge = (dateOfBirth: string | null, ageString: string | null): number => {
+    if (ageString) {
+      return parseInt(ageString, 10) || 0;
+    }
+    if (dateOfBirth) {
+      const birthDate = new Date(dateOfBirth);
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      return age;
+    }
+    return 0;
+  };
+
+  const formatGender = (gender: string | null): string => {
+    if (!gender) return "Not specified";
+    return gender.charAt(0).toUpperCase() + gender.slice(1).toLowerCase();
+  };
+
+  const formatDate = (dateString: string): string => {
+    const date = new Date(dateString);
+    return date.toISOString().split("T")[0];
+  };
+
+  return {
+    id: apiData.id.toString(),
+    name: apiData.fullName,
+    image: apiData.patientProfile?.profilePic || "/user-3.png",
+    age: calculateAge(apiData.patientProfile?.dateOfBirth || null, apiData.patientProfile?.age || null),
+    gender: formatGender(apiData.gender),
+    status: apiData.isActive ? "Active" : "Inactive",
+    lastVisit: formatDate(apiData.updatedAt),
+    condition: apiData.patientProfile?.allergies?.length ? apiData.patientProfile.allergies.join(", ") : "No allergies",
+  
+    email: apiData.email,
+    phone: apiData.phoneNumber,
+    bloodGroup: apiData.patientProfile?.bloodGroup || "Unknown",
+    city: apiData.city || "Not specified",
+    country: apiData.country || "Not specified",
+    allergies: apiData.patientProfile?.allergies || [],
+  };
+};
 
 // Define filter types
 type FilterState = {
@@ -160,10 +132,14 @@ type FilterState = {
   gender: string[];
   ageRange: [number, number];
   conditions: string[];
-  doctors: string[];
 };
 
 export default function PatientsPage() {
+  // State for patients data
+  const [patientsData, setPatientsData] = useState<Patient[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   // State for filters
   const [filters, setFilters] = useState<FilterState>({
     search: "",
@@ -171,28 +147,49 @@ export default function PatientsPage() {
     gender: [],
     ageRange: [0, 100],
     conditions: [],
-    doctors: [],
   });
 
   // State for filtered patients
-  const [filteredPatients, setFilteredPatients] = useState(patientsData);
+  const [filteredPatients, setFilteredPatients] = useState<Patient[]>([]);
 
   // State for active filter count
   const [activeFilterCount, setActiveFilterCount] = useState(0);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
-  // Extract unique conditions and doctors for filter options
+  // Fetch patients on mount
+  useEffect(() => {
+    const fetchPatients = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const response = await getPatientsForDoctor();
+        const transformedData = response.map((patient: ApiPatient) => transformPatient(patient));
+        setPatientsData(transformedData);
+        setFilteredPatients(transformedData);
+      } catch (err) {
+        console.error("Failed to fetch patients:", err);
+        setError("Failed to load patients. Please try again.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPatients();
+  }, []);
+
+  // Extract unique conditions for filter options
   const uniqueConditions = Array.from(new Set(patientsData.map((patient) => patient.condition)));
-  const uniqueDoctors = Array.from(new Set(patientsData.map((patient) => patient.doctor)));
 
   // Apply filters when filters state changes
   useEffect(() => {
-    let result = patientsData;
+    if (isLoading) return;
+    
+    let result = [...patientsData];
 
     // Apply search filter
     if (filters.search) {
       const searchLower = filters.search.toLowerCase();
-      result = result.filter((patient) => patient.name.toLowerCase().includes(searchLower) || patient.email.toLowerCase().includes(searchLower) || patient.condition.toLowerCase().includes(searchLower) || patient.doctor.toLowerCase().includes(searchLower) || patient.phone.includes(filters.search));
+      result = result.filter((patient) => patient.name.toLowerCase().includes(searchLower) || patient.email.toLowerCase().includes(searchLower) || patient.condition.toLowerCase().includes(searchLower) || patient.phone.includes(filters.search));
     }
 
     // Apply status filter
@@ -213,11 +210,7 @@ export default function PatientsPage() {
       result = result.filter((patient) => filters.conditions.includes(patient.condition));
     }
 
-    // Apply doctors filter
-    if (filters.doctors.length > 0) {
-      result = result.filter((patient) => filters.doctors.includes(patient.doctor));
-    }
-
+    
     setFilteredPatients(result);
 
     // Calculate active filter count
@@ -227,10 +220,10 @@ export default function PatientsPage() {
     if (filters.gender.length > 0) count++;
     if (filters.ageRange[0] > 0 || filters.ageRange[1] < 100) count++;
     if (filters.conditions.length > 0) count++;
-    if (filters.doctors.length > 0) count++;
+
 
     setActiveFilterCount(count);
-  }, [filters]);
+  }, [filters, patientsData, isLoading]);
 
   // Handle search input change
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -263,13 +256,11 @@ export default function PatientsPage() {
     });
   };
 
-  // Handle doctor filter change
-  const handleDoctorChange = (doctor: string) => {
-    setFilters((prev) => {
-      const newDoctors = prev.doctors.includes(doctor) ? prev.doctors.filter((d) => d !== doctor) : [...prev.doctors, doctor];
-      return { ...prev, doctors: newDoctors };
-    });
+  // Handle viewing patient details - store data in sessionStorage
+  const handleViewPatient = (patient: Patient) => {
+    sessionStorage.setItem(`patient_${patient.id}`, JSON.stringify(patient));
   };
+
 
   // Reset all filters
   const resetFilters = () => {
@@ -279,7 +270,6 @@ export default function PatientsPage() {
       gender: [],
       ageRange: [0, 100],
       conditions: [],
-      doctors: [],
     });
   };
 
@@ -292,7 +282,7 @@ export default function PatientsPage() {
             <p className="text-muted-foreground">Manage your patients and their medical records.</p>
           </div>
           <Button asChild>
-            <Link href="/patients/add">
+            <Link href="/doctor-dashboard/patients/add">
               <Plus className="mr-2 h-4 w-4" />
               Add Patient
             </Link>
@@ -381,20 +371,6 @@ export default function PatientsPage() {
                           ))}
                         </div>
                       </div>
-
-                      <div className="space-y-2">
-                        <Label>Doctors</Label>
-                        <div className="max-h-[150px] overflow-y-auto space-y-2 pr-2">
-                          {uniqueDoctors.map((doctor) => (
-                            <div key={doctor} className="flex items-center space-x-2">
-                              <Checkbox id={`doctor-${doctor}`} checked={filters.doctors.includes(doctor)} onCheckedChange={() => handleDoctorChange(doctor)} />
-                              <label htmlFor={`doctor-${doctor}`} className="text-sm">
-                                {doctor}
-                              </label>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
                     </div>
                   </PopoverContent>
                 </Popover>
@@ -449,15 +425,6 @@ export default function PatientsPage() {
                   </Badge>
                 ))}
 
-                {filters.doctors.map((doctor) => (
-                  <Badge key={doctor} variant="secondary" className="flex items-center gap-1">
-                    {doctor.replace("Dr. ", "")}
-                    <Button variant="ghost" size="icon" className="h-4 w-4 p-0 ml-1" onClick={() => handleDoctorChange(doctor)}>
-                      <X className="h-3 w-3" />
-                      <span className="sr-only">Remove {doctor} filter</span>
-                    </Button>
-                  </Badge>
-                ))}
 
                 {filters.search && (
                   <Badge variant="secondary" className="flex items-center gap-1">
@@ -476,7 +443,30 @@ export default function PatientsPage() {
             )}
           </CardHeader>
           <CardContent>
-            {filteredPatients.length === 0 ? (
+            {/* Loading state */}
+            {isLoading && (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <span className="ml-2 text-muted-foreground">Loading patients...</span>
+              </div>
+            )}
+
+            {/* Error state */}
+            {error && !isLoading && (
+              <div className="flex flex-col items-center justify-center py-10 text-center">
+                <div className="rounded-full bg-red-100 p-3 mb-3">
+                  <X className="h-6 w-6 text-red-500" />
+                </div>
+                <h3 className="text-lg font-semibold text-red-600">Error Loading Patients</h3>
+                <p className="text-muted-foreground mt-1 mb-4 max-w-md">{error}</p>
+                <Button variant="outline" onClick={() => window.location.reload()}>
+                  Try Again
+                </Button>
+              </div>
+            )}
+
+            {/* Empty state */}
+            {!isLoading && !error && filteredPatients.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-10 text-center">
                 <div className="rounded-full bg-muted p-3 mb-3">
                   <Search className="h-6 w-6 text-muted-foreground" />
@@ -487,7 +477,7 @@ export default function PatientsPage() {
                   Reset all filters
                 </Button>
               </div>
-            ) : (
+            ) : !isLoading && !error && (
               <Table className="whitespace-nowrap">
                 <TableHeader>
                   <TableRow>
@@ -496,7 +486,7 @@ export default function PatientsPage() {
                     <TableHead>Status</TableHead>
                     <TableHead className="table-cell">Last Visit</TableHead>
                     <TableHead className="table-cell">Condition</TableHead>
-                    <TableHead className="table-cell">Doctor</TableHead>
+                 
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -510,7 +500,13 @@ export default function PatientsPage() {
                             <AvatarFallback>{patient.name.charAt(0)}</AvatarFallback>
                           </Avatar>
                           <div>
-                            <p className="font-medium">{patient.name}</p>
+                            <Link 
+                              href={`/doctor-dashboard/patients/${patient.id}`} 
+                              onClick={() => handleViewPatient(patient)}
+                              className="font-medium hover:text-primary hover:underline cursor-pointer"
+                            >
+                              {patient.name}
+                            </Link>
                             <p className="text-sm text-muted-foreground md:hidden">
                               {patient.age} • {patient.gender}
                             </p>
@@ -527,7 +523,7 @@ export default function PatientsPage() {
                       </TableCell>
                       <TableCell className="table-cell">{patient.lastVisit}</TableCell>
                       <TableCell className="table-cell">{patient.condition}</TableCell>
-                      <TableCell className="table-cell">{patient.doctor}</TableCell>
+                     
                       <TableCell className="text-right">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
@@ -539,16 +535,16 @@ export default function PatientsPage() {
                           <DropdownMenuContent align="end">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
                             <DropdownMenuItem asChild>
-                              <Link href={`/patients/${patient.id}`}>View profile</Link>
+                              <Link href={`/doctor-dashboard/patients/${patient.id}`} onClick={() => handleViewPatient(patient)}>View profile</Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
-                              <Link href={`/patients/${patient.id}/edit`}>Edit details</Link>
+                              <Link href={`/doctor-dashboard/patients/${patient.id}/edit`}>Edit details</Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
-                              <Link href={`/patients/${patient.id}/history`}>Medical history</Link>
+                              <Link href={`/doctor-dashboard/patients/${patient.id}/history`}>Medical history</Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
-                              <Link href={`/patients/${patient.id}/prescriptions`}>Prescriptions</Link>
+                              <Link href={`/doctor-dashboard/patients/${patient.id}/prescriptions`}>Prescriptions</Link>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem onClick={() => setDeleteDialogOpen(true)} className="text-red-600">

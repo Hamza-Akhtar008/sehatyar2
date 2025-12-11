@@ -13,14 +13,44 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, Check, Clock, Download, Filter, MoreHorizontal, Plus, Search, X } from "lucide-react";
+import { getAppointmentsForDoctor } from "@/lib/api/apis";
+import { Calendar, Check, Clock, Download, Filter, Loader2, MoreHorizontal, Plus, Search, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+
+// API Response type
+interface ApiAppointment {
+  id: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  patientName: string;
+  phoneNumber: string;
+  email: string;
+  paymentMethod: string;
+  amount: number | null;
+  status: string;
+  notes: string;
+  appointmentDate: string;
+  appointmentTime: string;
+  appointmentFor: string;
+  userId: number;
+  doctorId: number;
+  medicalHistoryFiles: string[];
+  prescriptionFile: string | null;
+  clinicId: number | null;
+  isClinicAppointment: boolean;
+  appointmentType: string | null;
+}
+
+// UI Appointment type (used for display)
 type Appointment = {
   id: string;
   patient: {
     name: string;
     image: string;
+    email: string;
+    phone: string;
   };
   doctor: string;
   date: string;
@@ -29,154 +59,62 @@ type Appointment = {
   type: string;
   duration: string;
   department: string;
+  notes: string;
+  paymentMethod: string;
+  amount: number | null;
+  prescriptionFile: string | null;
+  medicalHistoryFiles: string[];
 };
-// Initial appointments data
-const initialAppointments: Appointment[] = [
-  {
-    id: "1",
+
+// Transform API response to UI format
+const transformAppointment = (apiData: ApiAppointment): Appointment => {
+  // Capitalize first letter of status
+  const formatStatus = (status: string): string => {
+    if (!status) return "Pending";
+    return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+  };
+
+  // Format appointment type
+  const formatType = (type: string | null): string => {
+    if (!type) return "Consultation";
+    switch (type.toLowerCase()) {
+      case "inclinic":
+        return "In-Clinic";
+      case "online":
+        return "Online";
+      case "video":
+        return "Video Call";
+      default:
+        return type.charAt(0).toUpperCase() + type.slice(1);
+    }
+  };
+
+  return {
+    id: apiData.id.toString(),
     patient: {
-      name: "John Smith",
-      image: "/colorful-abstract-shapes.png",
+      name: apiData.patientName,
+      image: "/user-3.png", // Default image
+      email: apiData.email,
+      phone: apiData.phoneNumber,
     },
-    doctor: "Dr. Sarah Johnson",
-    date: "2023-07-15",
-    time: "10:00 AM",
-    status: "Confirmed",
-    type: "Check-up",
-    duration: "30 min",
-    department: "General Medicine",
-  },
-  {
-    id: "2",
-    patient: {
-      name: "Emily Davis",
-      image: "/colorful-abstract-shapes.png",
-    },
-    doctor: "Dr. Michael Chen",
-    date: new Date().toISOString().split("T")[0], // Today's date
-    time: "11:30 AM",
-    status: "In Progress",
-    type: "Consultation",
-    duration: "45 min",
-    department: "Cardiology",
-  },
-  {
-    id: "3",
-    patient: {
-      name: "Robert Wilson",
-      image: "/user-3.png",
-    },
-    doctor: "Dr. Lisa Patel",
-    date: new Date().toISOString().split("T")[0], // Today's date
-    time: "02:15 PM",
-    status: "Completed",
-    type: "Follow-up",
-    duration: "20 min",
-    department: "Orthopedics",
-  },
-  {
-    id: "4",
-    patient: {
-      name: "Jessica Brown",
-      image: "/user-3.png",
-    },
-    doctor: "Dr. James Wilson",
-    date: "2023-07-25", // Future date
-    time: "09:00 AM",
-    status: "Confirmed",
-    type: "Dental Cleaning",
-    duration: "60 min",
-    department: "Dental",
-  },
-  {
-    id: "5",
-    patient: {
-      name: "Michael Johnson",
-      image: "/user-3.png",
-    },
-    doctor: "Dr. Emily Rodriguez",
-    date: "2023-07-28", // Future date
-    time: "10:30 AM",
-    status: "Confirmed",
-    type: "X-Ray",
-    duration: "15 min",
-    department: "Radiology",
-  },
-  {
-    id: "6",
-    patient: {
-      name: "Sarah Thompson",
-      image: "/user-3.png",
-    },
-    doctor: "Dr. Robert Kim",
-    date: "2023-07-10", // Past date
-    time: "01:45 PM",
-    status: "Cancelled",
-    type: "Therapy Session",
-    duration: "45 min",
-    department: "Psychiatry",
-  },
-  {
-    id: "7",
-    patient: {
-      name: "David Miller",
-      image: "/user-3.png",
-    },
-    doctor: "Dr. Jennifer Lee",
-    date: "2023-07-05", // Past date
-    time: "11:00 AM",
-    status: "Completed",
-    type: "Annual Physical",
-    duration: "60 min",
-    department: "General Medicine",
-  },
-  {
-    id: "8",
-    patient: {
-      name: "Amanda Clark",
-      image: "/user-3.png",
-    },
-    doctor: "Dr. Thomas Brown",
-    date: "2023-07-08", // Past date
-    time: "09:30 AM",
-    status: "Cancelled",
-    type: "Vaccination",
-    duration: "15 min",
-    department: "Pediatrics",
-  },
-  {
-    id: "9",
-    patient: {
-      name: "Kevin Martinez",
-      image: "/user-3.png",
-    },
-    doctor: "Dr. Sarah Johnson",
-    date: new Date(new Date().setDate(new Date().getDate() + 3)).toISOString().split("T")[0], // 3 days from now
-    time: "02:00 PM",
-    status: "Confirmed",
-    type: "Check-up",
-    duration: "30 min",
-    department: "General Medicine",
-  },
-  {
-    id: "10",
-    patient: {
-      name: "Sophia Wilson",
-      image: "/user-3.png",
-    },
-    doctor: "Dr. Michael Chen",
-    date: new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split("T")[0], // Tomorrow
-    time: "10:15 AM",
-    status: "Confirmed",
-    type: "Consultation",
-    duration: "45 min",
-    department: "Neurology",
-  },
-];
+    doctor: "Doctor", // Will be the logged-in doctor
+    date: new Date(apiData.appointmentDate).toISOString().split("T")[0],
+    time: apiData.appointmentTime,
+    status: formatStatus(apiData.status),
+    type: formatType(apiData.appointmentType),
+    duration: "30 min", // Default duration
+    department: "General", // Default department
+    notes: apiData.notes || "",
+    paymentMethod: apiData.paymentMethod,
+    amount: apiData.amount,
+    prescriptionFile: apiData.prescriptionFile,
+    medicalHistoryFiles: apiData.medicalHistoryFiles || [],
+  };
+};
 
 // Get unique values for filter options
 function getUniqueValues<T>(data: T[], key: keyof T | string): string[] {
-  const keyStr = String(key); // Ensure key is treated as a string
+  const keyStr = String(key);
 
   return [
     ...new Set(
@@ -188,14 +126,16 @@ function getUniqueValues<T>(data: T[], key: keyof T | string): string[] {
         return (item as any)[keyStr];
       })
     ),
-  ];
+  ].filter(Boolean);
 }
 
 export default function AppointmentsPage() {
   const [activeTab, setActiveTab] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
-  const [appointments, setAppointments] = useState(initialAppointments);
-  const [filteredAppointments, setFilteredAppointments] = useState(initialAppointments);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [filteredAppointments, setFilteredAppointments] = useState<Appointment[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<any>({
     status: [],
     type: [],
@@ -204,6 +144,28 @@ export default function AppointmentsPage() {
     duration: [],
   });
   const [isFiltersApplied, setIsFiltersApplied] = useState(false);
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+
+  // Fetch appointments on mount
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const response = await getAppointmentsForDoctor();
+        const transformedData = response.map((apt: ApiAppointment) => transformAppointment(apt));
+        setAppointments(transformedData);
+        setFilteredAppointments(transformedData);
+      } catch (err) {
+        console.error("Failed to fetch appointments:", err);
+        setError("Failed to load appointments. Please try again.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchAppointments();
+  }, []);
 
   // Get unique values for filter options
   const statusOptions = getUniqueValues(appointments, "status");
@@ -211,10 +173,11 @@ export default function AppointmentsPage() {
   const doctorOptions = getUniqueValues(appointments, "doctor");
   const departmentOptions = getUniqueValues(appointments, "department");
   const durationOptions = getUniqueValues(appointments, "duration");
-  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   // Apply filters and search
   useEffect(() => {
-    let result = [...initialAppointments];
+    if (isLoading) return;
+    
+    let result = [...appointments];
 
     // Apply tab filter first
     if (activeTab === "upcoming") {
@@ -269,7 +232,7 @@ export default function AppointmentsPage() {
 
     setIsFiltersApplied(hasActiveFilters);
     setFilteredAppointments(result);
-  }, [activeTab, searchTerm, filters]);
+  }, [activeTab, searchTerm, filters, appointments, isLoading]);
 
   // Handle filter changes
   const handleFilterChange = (filterType: any, value: any) => {
@@ -325,14 +288,11 @@ export default function AppointmentsPage() {
             <p className="text-muted-foreground">Manage your clinic's appointments and schedules.</p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <Button variant="outline" href="/appointments/calendar">
+            <Button variant="outline" href="/doctor-dashboard/appointments/calendar">
               <Calendar className="mr-2 h-4 w-4" />
               Calendar View
             </Button>
-            <Button href="/appointments/add">
-              <Plus className="mr-2 h-4 w-4" />
-              New Appointment
-            </Button>
+          
           </div>
         </div>
 
@@ -345,8 +305,30 @@ export default function AppointmentsPage() {
             <TabsTrigger value="cancelled">Cancelled</TabsTrigger>
           </TabsList>
 
+          {/* Loading state */}
+          {isLoading && (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <span className="ml-2 text-muted-foreground">Loading appointments...</span>
+            </div>
+          )}
+
+          {/* Error state */}
+          {error && !isLoading && (
+            <Card className="p-6">
+              <div className="flex flex-col items-center justify-center py-8 text-center">
+                <X className="h-12 w-12 text-red-500 mb-2" />
+                <h3 className="text-lg font-semibold text-red-600">Error Loading Appointments</h3>
+                <p className="text-muted-foreground mb-4">{error}</p>
+                <Button onClick={() => window.location.reload()} variant="outline">
+                  Try Again
+                </Button>
+              </div>
+            </Card>
+          )}
+
           {/* Tab content - shared structure for all tabs */}
-          {["all", "upcoming", "today", "completed", "cancelled"].map((tabValue) => (
+          {!isLoading && !error && ["all", "upcoming", "today", "completed", "cancelled"].map((tabValue) => (
             <TabsContent key={tabValue} value={tabValue}>
               <Card>
                 <CardHeader className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
@@ -481,11 +463,11 @@ export default function AppointmentsPage() {
                     <TableHeader>
                       <TableRow>
                         <TableHead>Patient</TableHead>
-                        <TableHead className="table-cell">Doctor</TableHead>
+                        <TableHead className="table-cell">Contact</TableHead>
                         <TableHead>{tabValue === "today" ? "Time" : "Date & Time"}</TableHead>
+                        <TableHead className="table-cell">Issue/Notes</TableHead>
+                        <TableHead>Type</TableHead>
                         <TableHead>Status</TableHead>
-                        <TableHead className="table-cell">Type</TableHead>
-                        <TableHead className="table-cell">Duration</TableHead>
                         <TableHead className="text-right">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -500,24 +482,36 @@ export default function AppointmentsPage() {
                               </Avatar>
                               <div>
                                 <p className="font-medium">{appointment.patient.name}</p>
-                                <p className="text-sm text-muted-foreground md:hidden">{appointment.doctor}</p>
                               </div>
                             </div>
                           </TableCell>
-                          <TableCell className="table-cell">{appointment.doctor}</TableCell>
+                          <TableCell className="table-cell">
+                            <div>
+                              <p className="text-sm">{appointment.patient.phone}</p>
+                              <p className="text-xs text-muted-foreground">{appointment.patient.email}</p>
+                            </div>
+                          </TableCell>
                           <TableCell>
                             <div>
                               {tabValue !== "today" && <p>{appointment.date}</p>}
                               <p className={`text-sm ${tabValue === "today" ? "" : "text-muted-foreground"}`}>{appointment.time}</p>
                             </div>
                           </TableCell>
+                          <TableCell className="table-cell">
+                            <p className="text-sm max-w-[200px] truncate" title={appointment.notes}>
+                              {appointment.notes || "No notes"}
+                            </p>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className={appointment.type === "In-Clinic" ? "border-blue-500 text-blue-500" : "border-purple-500 text-purple-500"}>
+                              {appointment.type}
+                            </Badge>
+                          </TableCell>
                           <TableCell>
                             <Badge variant={getBadgeVariant(appointment.status).variant as any} className={getBadgeVariant(appointment.status).className}>
                               {appointment.status}
                             </Badge>
                           </TableCell>
-                          <TableCell className="table-cell">{appointment.type}</TableCell>
-                          <TableCell className="table-cell">{appointment.duration}</TableCell>
                           <TableCell className="text-right">
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
@@ -529,16 +523,16 @@ export default function AppointmentsPage() {
                               <DropdownMenuContent align="end">
                                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                 <DropdownMenuItem asChild>
-                                  <Link href={`/appointments/${appointment.id}`}>View details</Link>
+                                  <Link href={`/doctor-dashboard/appointments/${appointment.id}`}>View details</Link>
                                 </DropdownMenuItem>
 
                                 {appointment.status !== "Completed" && appointment.status !== "Cancelled" && (
                                   <>
                                     <DropdownMenuItem asChild>
-                                      <Link href={`/appointments/${appointment.id}/edit`}>Edit appointment</Link>
+                                      <Link href={`/doctor-dashboard/appointments/${appointment.id}/edit`}>Edit appointment</Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
-                                      <Link href={`/appointments/${appointment.id}/reschedule`}>Reschedule</Link>
+                                      <Link href={`/doctor-dashboard/appointments/${appointment.id}/reschedule`}>Reschedule</Link>
                                     </DropdownMenuItem>
                                   </>
                                 )}
@@ -566,7 +560,7 @@ export default function AppointmentsPage() {
 
                                 {appointment.status === "Cancelled" && (
                                   <DropdownMenuItem asChild>
-                                    <Link href={`/appointments/${appointment.id}/reschedule`}>Reschedule appointment</Link>
+                                    <Link href={`/doctor-dashboard/appointments/${appointment.id}/reschedule`}>Reschedule appointment</Link>
                                   </DropdownMenuItem>
                                 )}
 

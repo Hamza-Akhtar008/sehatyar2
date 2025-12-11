@@ -6,141 +6,132 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, ChevronLeft, ChevronRight, Plus, XCircle } from "lucide-react";
+import { getAppointmentsForDoctor } from "@/lib/api/apis";
+import { ArrowLeft, ChevronLeft, ChevronRight, Loader2, Plus, XCircle } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-// Sample appointments data
-const appointments = [
-  {
-    id: "1",
+// API Response type
+interface ApiAppointment {
+  id: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  patientName: string;
+  phoneNumber: string;
+  email: string;
+  paymentMethod: string;
+  amount: number | null;
+  status: string;
+  notes: string;
+  appointmentDate: string;
+  appointmentTime: string;
+  appointmentFor: string;
+  userId: number;
+  doctorId: number;
+  medicalHistoryFiles: string[];
+  prescriptionFile: string | null;
+  clinicId: number | null;
+  isClinicAppointment: boolean;
+  appointmentType: string | null;
+}
+
+// Calendar Appointment type
+interface CalendarAppointment {
+  id: string;
+  patient: {
+    name: string;
+    image: string;
+  };
+  doctor: string;
+  date: Date;
+  time: string;
+  endTime: string;
+  status: string;
+  type: string;
+  duration: number;
+  department: string;
+  color: string;
+}
+
+// Get color based on status
+const getColorByStatus = (status: string): string => {
+  switch (status.toLowerCase()) {
+    case "confirmed":
+      return "blue";
+    case "in progress":
+    case "pending":
+      return "amber";
+    case "completed":
+      return "green";
+    case "cancelled":
+      return "red";
+    default:
+      return "gray";
+  }
+};
+
+// Calculate end time based on start time and duration
+const calculateEndTime = (startTime: string, durationMinutes: number = 30): string => {
+  const [time, period] = startTime.split(" ");
+  const [hours, minutes] = time.split(":").map(Number);
+  
+  let totalMinutes = hours * 60 + minutes + durationMinutes;
+  if (period === "PM" && hours !== 12) totalMinutes += 12 * 60;
+  if (period === "AM" && hours === 12) totalMinutes -= 12 * 60;
+  
+  let endHours = Math.floor(totalMinutes / 60) % 24;
+  const endMinutes = totalMinutes % 60;
+  const endPeriod = endHours >= 12 ? "PM" : "AM";
+  
+  if (endHours > 12) endHours -= 12;
+  if (endHours === 0) endHours = 12;
+  
+  return `${endHours.toString().padStart(2, "0")}:${endMinutes.toString().padStart(2, "0")} ${endPeriod}`;
+};
+
+// Transform API response to Calendar format
+const transformAppointment = (apiData: ApiAppointment): CalendarAppointment => {
+  const formatStatus = (status: string): string => {
+    if (!status) return "Pending";
+    return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+  };
+
+  const formatType = (type: string | null): string => {
+    if (!type) return "Consultation";
+    switch (type.toLowerCase()) {
+      case "inclinic":
+        return "In-Clinic";
+      case "online":
+        return "Online";
+      case "video":
+        return "Video Call";
+      default:
+        return type.charAt(0).toUpperCase() + type.slice(1);
+    }
+  };
+
+  const status = formatStatus(apiData.status);
+  const appointmentDate = new Date(apiData.appointmentDate);
+  appointmentDate.setHours(0, 0, 0, 0);
+
+  return {
+    id: apiData.id.toString(),
     patient: {
-      name: "John Smith",
-      image: "/colorful-abstract-shapes.png",
+      name: apiData.patientName,
+      image: "/user-3.png",
     },
-    doctor: "Dr. Sarah Johnson",
-    date: new Date(new Date().setHours(0, 0, 0, 0)),
-    time: "10:00 AM",
-    endTime: "10:30 AM",
-    status: "Confirmed",
-    type: "Check-up",
+    doctor: "Doctor",
+    date: appointmentDate,
+    time: apiData.appointmentTime,
+    endTime: calculateEndTime(apiData.appointmentTime, 30),
+    status: status,
+    type: formatType(apiData.appointmentType),
     duration: 30,
-    department: "General Medicine",
-    color: "blue",
-  },
-  {
-    id: "2",
-    patient: {
-      name: "Emily Davis",
-      image: "/colorful-abstract-shapes.png",
-    },
-    doctor: "Dr. Michael Chen",
-    date: new Date(new Date().setHours(0, 0, 0, 0)),
-    time: "11:30 AM",
-    endTime: "12:15 PM",
-    status: "In Progress",
-    type: "Consultation",
-    duration: 45,
-    department: "Cardiology",
-    color: "amber",
-  },
-  {
-    id: "3",
-    patient: {
-      name: "Robert Wilson",
-      image: "/user-3.png",
-    },
-    doctor: "Dr. Lisa Patel",
-    date: new Date(new Date().setHours(0, 0, 0, 0)),
-    time: "02:15 PM",
-    endTime: "02:35 PM",
-    status: "Completed",
-    type: "Follow-up",
-    duration: 20,
-    department: "Orthopedics",
-    color: "green",
-  },
-  {
-    id: "4",
-    patient: {
-      name: "Jessica Brown",
-      image: "/user-3.png",
-    },
-    doctor: "Dr. James Wilson",
-    date: new Date(new Date().setDate(new Date().getDate() + 1)),
-    time: "09:00 AM",
-    endTime: "10:00 AM",
-    status: "Confirmed",
-    type: "Dental Cleaning",
-    duration: 60,
-    department: "Dental",
-    color: "purple",
-  },
-  {
-    id: "5",
-    patient: {
-      name: "Michael Johnson",
-      image: "/user-3.png",
-    },
-    doctor: "Dr. Emily Rodriguez",
-    date: new Date(new Date().setDate(new Date().getDate() + 1)),
-    time: "10:30 AM",
-    endTime: "10:45 AM",
-    status: "Confirmed",
-    type: "X-Ray",
-    duration: 15,
-    department: "Radiology",
-    color: "indigo",
-  },
-  {
-    id: "6",
-    patient: {
-      name: "Sarah Thompson",
-      image: "/user-3.png",
-    },
-    doctor: "Dr. Robert Kim",
-    date: new Date(new Date().setDate(new Date().getDate() - 1)),
-    time: "01:45 PM",
-    endTime: "02:30 PM",
-    status: "Cancelled",
-    type: "Therapy Session",
-    duration: 45,
-    department: "Psychiatry",
-    color: "red",
-  },
-  {
-    id: "7",
-    patient: {
-      name: "David Miller",
-      image: "/user-3.png",
-    },
-    doctor: "Dr. Jennifer Lee",
-    date: new Date(new Date().setDate(new Date().getDate() - 2)),
-    time: "11:00 AM",
-    endTime: "12:00 PM",
-    status: "Completed",
-    type: "Annual Physical",
-    duration: 60,
-    department: "General Medicine",
-    color: "blue",
-  },
-  {
-    id: "8",
-    patient: {
-      name: "Amanda Clark",
-      image: "/user-3.png",
-    },
-    doctor: "Dr. Thomas Brown",
-    date: new Date(new Date().setDate(new Date().getDate() - 3)),
-    time: "09:30 AM",
-    endTime: "09:45 AM",
-    status: "Cancelled",
-    type: "Vaccination",
-    duration: 15,
-    department: "Pediatrics",
-    color: "teal",
-  },
-];
+    department: "General",
+    color: getColorByStatus(status),
+  };
+};
 
 // Time slots for day view
 const timeSlots = ["08:00 AM", "09:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "01:00 PM", "02:00 PM", "03:00 PM", "04:00 PM", "05:00 PM"];
@@ -148,27 +139,6 @@ const timeSlots = ["08:00 AM", "09:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "
 // Days of the week
 const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const shortDaysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
-// Function to get appointments for a specific date
-const getAppointmentsForDate = (date: any) => {
-  return appointments.filter((appointment) => appointment.date.getDate() === date.getDate() && appointment.date.getMonth() === date.getMonth() && appointment.date.getFullYear() === date.getFullYear());
-};
-
-// Function to get appointments for a specific week
-const getAppointmentsForWeek = (date: any) => {
-  const startOfWeek = new Date(date);
-  startOfWeek.setDate(date.getDate() - date.getDay()); // Start from Sunday
-
-  const endOfWeek = new Date(startOfWeek);
-  endOfWeek.setDate(startOfWeek.getDate() + 6); // End on Saturday
-
-  return appointments.filter((appointment) => appointment.date >= startOfWeek && appointment.date <= endOfWeek);
-};
-
-// Function to get appointments for a specific month
-const getAppointmentsForMonth = (date: any) => {
-  return appointments.filter((appointment) => appointment.date.getMonth() === date.getMonth() && appointment.date.getFullYear() === date.getFullYear());
-};
 
 // Function to get days in month
 const getDaysInMonth = (year: any, month: any) => {
@@ -178,11 +148,6 @@ const getDaysInMonth = (year: any, month: any) => {
 // Function to get first day of month
 const getFirstDayOfMonth = (year: any, month: any) => {
   return new Date(year, month, 1).getDay();
-};
-
-// Function to format time (e.g., "10:00 AM")
-const formatTime = (timeString: any) => {
-  return timeString;
 };
 
 // Function to get status badge variant
@@ -200,6 +165,8 @@ const getStatusBadge = (status: any) => {
       return <Badge className="bg-green-500">Completed</Badge>;
     case "Cancelled":
       return <Badge variant="destructive">Cancelled</Badge>;
+    case "Pending":
+      return <Badge className="bg-amber-500">Pending</Badge>;
     default:
       return <Badge variant="outline">Unknown</Badge>;
   }
@@ -209,6 +176,60 @@ export default function CalendarPage() {
   const [view, setView] = useState("day"); // day, week, month
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDoctor, setSelectedDoctor] = useState("all");
+  const [appointments, setAppointments] = useState<CalendarAppointment[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch appointments on mount
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const response = await getAppointmentsForDoctor();
+        const transformedData = response.map((apt: ApiAppointment) => transformAppointment(apt));
+        setAppointments(transformedData);
+      } catch (err) {
+        console.error("Failed to fetch appointments:", err);
+        setError("Failed to load appointments. Please try again.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchAppointments();
+  }, []);
+
+  // Function to get appointments for a specific date
+  const getAppointmentsForDate = (date: Date) => {
+    return appointments.filter(
+      (appointment) =>
+        appointment.date.getDate() === date.getDate() &&
+        appointment.date.getMonth() === date.getMonth() &&
+        appointment.date.getFullYear() === date.getFullYear()
+    );
+  };
+
+  // Function to get appointments for a specific week
+  const getAppointmentsForWeek = (date: Date) => {
+    const startOfWeek = new Date(date);
+    startOfWeek.setDate(date.getDate() - date.getDay());
+    startOfWeek.setHours(0, 0, 0, 0);
+
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+    endOfWeek.setHours(23, 59, 59, 999);
+
+    return appointments.filter((appointment) => appointment.date >= startOfWeek && appointment.date <= endOfWeek);
+  };
+
+  // Function to get appointments for a specific month
+  const getAppointmentsForMonth = (date: Date) => {
+    return appointments.filter(
+      (appointment) =>
+        appointment.date.getMonth() === date.getMonth() && appointment.date.getFullYear() === date.getFullYear()
+    );
+  };
 
   // Navigate to previous period
   const goToPrevious = () => {
@@ -447,7 +468,7 @@ export default function CalendarPage() {
     <div className="flex flex-col gap-5">
       <div className="flex items-center gap-4 flex-wrap">
         <Button variant="outline" size="icon" asChild>
-          <Link href="/appointments">
+          <Link href="/doctor-dashboard/appointments">
             <ArrowLeft className="h-4 w-4" />
             <span className="sr-only">Back</span>
           </Link>
@@ -486,27 +507,44 @@ export default function CalendarPage() {
             <div className="flex items-center gap-2 w-full sm:w-auto">
               <Select value={selectedDoctor} onValueChange={setSelectedDoctor}>
                 <SelectTrigger className="w-full sm:w-[200px]">
-                  <SelectValue placeholder="Filter by doctor" />
+                  <SelectValue placeholder="Filter by status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Doctors</SelectItem>
-                  <SelectItem value="Dr. Sarah Johnson">Dr. Sarah Johnson</SelectItem>
-                  <SelectItem value="Dr. Michael Chen">Dr. Michael Chen</SelectItem>
-                  <SelectItem value="Dr. Lisa Patel">Dr. Lisa Patel</SelectItem>
-                  <SelectItem value="Dr. James Wilson">Dr. James Wilson</SelectItem>
-                  <SelectItem value="Dr. Emily Rodriguez">Dr. Emily Rodriguez</SelectItem>
+                  <SelectItem value="all">All Appointments</SelectItem>
                 </SelectContent>
               </Select>
-              <Button href="/appointments/add">
-                <Plus className="h-4 w-4 mr-2" />
-                New
-              </Button>
+             
             </div>
           </div>
 
-          {view === "day" && renderDayView()}
-          {view === "week" && renderWeekView()}
-          {view === "month" && renderMonthView()}
+          {/* Loading state */}
+          {isLoading && (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <span className="ml-2 text-muted-foreground">Loading appointments...</span>
+            </div>
+          )}
+
+          {/* Error state */}
+          {error && !isLoading && (
+            <div className="flex flex-col items-center justify-center py-8 text-center">
+              <XCircle className="h-12 w-12 text-red-500 mb-2" />
+              <h3 className="text-lg font-semibold text-red-600">Error Loading Appointments</h3>
+              <p className="text-muted-foreground mb-4">{error}</p>
+              <Button onClick={() => window.location.reload()} variant="outline">
+                Try Again
+              </Button>
+            </div>
+          )}
+
+          {/* Calendar views */}
+          {!isLoading && !error && (
+            <>
+              {view === "day" && renderDayView()}
+              {view === "week" && renderWeekView()}
+              {view === "month" && renderMonthView()}
+            </>
+          )}
         </CardContent>
       </Card>
     </div>

@@ -112,7 +112,7 @@ export const getAppointments = async () => {
 }
 
 
-export const deleteClinic = async (id:number)=>{
+export const deleteClinic = async (id: number) => {
   try {
     const response = await axios.delete(`${BASE_URL}clinic/${id}`);
     return response.data;
@@ -122,7 +122,7 @@ export const deleteClinic = async (id:number)=>{
   }
 }
 
-export const deleteDoctor = async (id:number)=>{
+export const deleteDoctor = async (id: number) => {
   try {
     const response = await axios.delete(`${BASE_URL}doctor-profile/${id}`);
     return response.data;
@@ -133,7 +133,7 @@ export const deleteDoctor = async (id:number)=>{
 }
 
 
-export const deleteReceptionist = async (id:number)=>{
+export const deleteReceptionist = async (id: number) => {
   try {
     const response = await axios.delete(`${BASE_URL}users/${id}`);
     return response.data;
@@ -144,7 +144,7 @@ export const deleteReceptionist = async (id:number)=>{
 }
 
 
-export const deletePatient = async (id:number)=>{
+export const deletePatient = async (id: number) => {
   try {
     const response = await axios.delete(`${BASE_URL}users/${id}`);
     return response.data;
@@ -155,7 +155,7 @@ export const deletePatient = async (id:number)=>{
 }
 
 
-export const deleteAppointment = async (id:number)=>{
+export const deleteAppointment = async (id: number) => {
   try {
     const response = await axios.delete(`${BASE_URL}appointments/${id}`);
     return response.data;
@@ -304,7 +304,7 @@ export const getAppointmentsByPatientId = async (id: string) => {
 export const getAppointmentById = async (id: string) => {
   try {
     const accessToken = localStorage.getItem("access_token");
-    const response = await axios.get(`${BASE_URL}appointments/patient/${id}`, {
+    const response = await axios.get(`${BASE_URL}appointments/${id}`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -329,6 +329,110 @@ export const updateAppointmentFile = async (id: string, payload: FormData) => {
     return response.data;
   } catch (error) {
     console.error(`Error uploading file for appointment ${id}:`, error);
+    throw error;
+  }
+};
+
+export const getAppointmentsForDoctor = async () => {
+  try {
+    const accessToken = localStorage.getItem("access_token");
+    const response = await axios.get(`${BASE_URL}appointments/for/doctor`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching appointments for doctor:", error);
+    throw error;
+  }
+};
+
+export const getPatientsForDoctor = async () => {
+  try {
+    const accessToken = localStorage.getItem("access_token");
+    const response = await axios.get(`${BASE_URL}doctor-profile/patients/only`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching patients for doctor:", error);
+    throw error;
+  }
+};
+
+export const patchAppointment = async (data: FormData, id: string) => {
+  try {
+    const accessToken = localStorage.getItem("access_token");
+    const response = await axios.patch(`${BASE_URL}appointments/${id}`, data, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error updating appointment:", error);
+    throw error;
+  }
+};
+
+export const getPatientAppointments = async (userId: string) => {
+  try {
+    const accessToken = localStorage.getItem("access_token");
+    const response = await axios.get(`${BASE_URL}appointments/patient/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching patient appointments:", error);
+    throw error;
+  }
+};
+
+// Receptionist APIs for individual doctors
+export const getReceptionists = async () => {
+  try {
+    const accessToken = localStorage.getItem("access_token");
+    const response = await axios.get(`${BASE_URL}doctor-profile/individual/doctor/receptionist`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching receptionists:", error);
+    throw error;
+  }
+};
+
+export interface AddReceptionistPayload {
+  fullName: string;
+  gender: "male" | "female" | "other";
+  country: string;
+  city: string;
+  email: string;
+  phoneNumber: string;
+  password: string;
+  role: string;
+}
+
+export const addReceptionist = async (payload: AddReceptionistPayload) => {
+  try {
+    const accessToken = localStorage.getItem("access_token");
+    const response = await axios.patch(`${BASE_URL}doctor-profile/add/resceptionist`, payload, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error adding receptionist:", error);
     throw error;
   }
 };
