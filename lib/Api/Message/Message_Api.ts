@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "https://sehatyarr-c23468ec8014.herokuapp.com"; // Using the URL from Messages.tsx component
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL; // Using the URL from Messages.tsx component
 
 export const UploadFile = async (formData: FormData) => {
   try {
