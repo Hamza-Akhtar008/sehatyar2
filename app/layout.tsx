@@ -12,13 +12,16 @@ export const metadata: Metadata = {
 };
 
 import { AuthProvider } from "@/context/AuthContext";
+import { LocationProvider } from "@/src/contexts/LocationContext";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body className={inter.className}>
         <AuthProvider>
-          <ThemeProvider>{children}</ThemeProvider>
+          <LocationProvider>
+            <ThemeProvider>{children}</ThemeProvider>
+          </LocationProvider>
         </AuthProvider>
       </body>
     </html>

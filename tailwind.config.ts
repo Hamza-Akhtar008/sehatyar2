@@ -10,6 +10,13 @@ const config: Config = {
   ],
   theme: {
   	extend: {
+      fontFamily: {
+        geist: ["var(--font-geist-sans)", "sans-serif"],
+        "geist-mono": ["var(--font-geist-mono)", "monospace"],
+        montserrat: ["var(--font-montserrat)", "sans-serif"],
+        plusjakarta: ["var(--font-plusjakarta)", "sans-serif"],
+        inter: ["var(--font-inter)", "sans-serif"],
+      },
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',

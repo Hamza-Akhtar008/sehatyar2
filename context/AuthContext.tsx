@@ -48,7 +48,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Redirect based on role
     if (userData.role === UserRole.ADMIN) {
-      router.push("/admin-dashboard/clinics"); // Assuming clinics is the default view for admin
+      router.push("/admin-dashboard"); // Assuming clinics is the default view for admin
     } else if (userData.role === UserRole.DOCTOR || userData.role === UserRole.CLINICDOCTOR || userData.role === UserRole.INDIVIDUALDOCTOR) {
         // Assuming doctor dashboard exists, otherwise redirect to home/safe page
          router.push("/doctor-dashboard");
@@ -74,35 +74,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   
     // Role based route protection logic could be here or in layout. 
     // Implementing basic protection here to ensure redirection if unauthorized.
-  useEffect(() => {
-    if (isLoading) return;
+  // useEffect(() => {
+  //   if (isLoading) return;
 
-    const isPublicRoute = pathname === "/" || pathname === "/auth/register" || pathname === "/auth/forgot-password";
+  //   const isPublicRoute = pathname === "/" || pathname === "/auth/register" || pathname === "/auth/forgot-password";
     
-    // If not logged in and trying to access protected route (assuming all non-public are protected)
-    if (!token && !isPublicRoute) {
-        // e.g. /admin-dashboard should redirect to /
-        // router.push("/"); 
-        // User specifically asked for layout allowed roles, so we will handle strict checks there.
-        // But basic check:
-    }
+  //   // If not logged in and trying to access protected route (assuming all non-public are protected)
+  //   if (!token && !isPublicRoute) {
+  //       // e.g. /admin-dashboard should redirect to /
+  //       // router.push("/"); 
+  //       // User specifically asked for layout allowed roles, so we will handle strict checks there.
+  //       // But basic check:
+  //   }
     
-    // If logged in, prevent access to login page
-    if (token && isPublicRoute) {
-         if (user?.role === UserRole.ADMIN) {
-             router.push("/admin-dashboard/clinics");
-         } else if (user?.role === UserRole.DOCTOR || user?.role === UserRole.CLINICDOCTOR || user?.role === UserRole.INDIVIDUALDOCTOR) {
-             router.push("/doctor-dashboard");
-         } else if (user?.role === UserRole.RECEPTIONIST || user?.role === UserRole.CLINICRECEPTIONIST) {
-             router.push("/receptionist-dashboard");
-         } else if (user?.role === UserRole.PATIENT) {
-             router.push("/patient-dashboard");
-         } else if (user?.role === UserRole.CLINIC) {
-             router.push("/clinic-dashboard");
-         }
-    }
+  //   // If logged in, prevent access to login page
+  //   if (token && isPublicRoute) {
+  //        if (user?.role === UserRole.ADMIN) {
+  //            router.push("/admin-dashboard");
+  //        } else if (user?.role === UserRole.DOCTOR || user?.role === UserRole.CLINICDOCTOR || user?.role === UserRole.INDIVIDUALDOCTOR) {
+  //            router.push("/doctor-dashboard");
+  //        } else if (user?.role === UserRole.RECEPTIONIST || user?.role === UserRole.CLINICRECEPTIONIST) {
+  //            router.push("/receptionist-dashboard");
+  //        } else if (user?.role === UserRole.PATIENT) {
+  //            router.push("/patient-dashboard");
+  //        } else if (user?.role === UserRole.CLINIC) {
+  //            router.push("/clinic-dashboard");
+  //        }
+  //   }
 
-  }, [token, pathname, isLoading, user]);
+  // }, [token, pathname, isLoading, user]);
 
 
   return (

@@ -110,7 +110,6 @@ export default function AppointmentsPage() {
   // Apply filters and search
   useEffect(() => {
     let result = [...appointments];
-
     // Apply tab filter first
     if (activeTab === "upcoming") {
       const today = new Date();
