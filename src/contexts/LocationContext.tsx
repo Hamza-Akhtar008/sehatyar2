@@ -86,62 +86,63 @@ export const LocationProvider = ({ children }: { children: React.ReactNode }) =>
     }
   }, [googleMapsLoaded]);
 
+  // AUTO-DETECT LOCATION DISABLED
   // Get user's current location on mount
-  useEffect(() => {
-    if (!googleMapsLoaded || !geocoderRef.current || city) return;
-
-    const getCurrentCity = () => {
-      setIsLoadingLocation(true);
-      
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const { latitude, longitude } = position.coords;
-            
-            geocoderRef.current.geocode(
-              { location: { lat: latitude, lng: longitude } },
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              (results: any[], status: string) => {
-                setIsLoadingLocation(false);
-                if (status === "OK" && results[0]) {
-                  // Find city from address components
-                  const addressComponents = results[0].address_components;
-                  let cityName = "";
-                  
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  for (const component of addressComponents) {
-                    if (component.types.includes("locality")) {
-                      cityName = component.long_name;
-                      break;
-                    }
-                    if (component.types.includes("administrative_area_level_2")) {
-                      cityName = component.long_name;
-                    }
-                    if (!cityName && component.types.includes("administrative_area_level_1")) {
-                      cityName = component.long_name;
-                    }
-                  }
-                  
-                  if (cityName) {
-                    setCity(cityName);
-                  }
-                }
-              }
-            );
-          },
-          (error) => {
-            setIsLoadingLocation(false);
-            console.log("Geolocation error:", error.message);
-          },
-          { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 }
-        );
-      } else {
-        setIsLoadingLocation(false);
-      }
-    };
-
-    getCurrentCity();
-  }, [googleMapsLoaded, city]);
+  // useEffect(() => {
+  //   if (!googleMapsLoaded || !geocoderRef.current || city) return;
+  //
+  //   const getCurrentCity = () => {
+  //     setIsLoadingLocation(true);
+  //
+  //     if (navigator.geolocation) {
+  //       navigator.geolocation.getCurrentPosition(
+  //         (position) => {
+  //           const { latitude, longitude } = position.coords;
+  //
+  //           geocoderRef.current.geocode(
+  //             { location: { lat: latitude, lng: longitude } },
+  //             // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  //             (results: any[], status: string) => {
+  //               setIsLoadingLocation(false);
+  //               if (status === "OK" && results[0]) {
+  //                 // Find city from address components
+  //                 const addressComponents = results[0].address_components;
+  //                 let cityName = "";
+  //
+  //                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  //                 for (const component of addressComponents) {
+  //                   if (component.types.includes("locality")) {
+  //                     cityName = component.long_name;
+  //                     break;
+  //                   }
+  //                   if (component.types.includes("administrative_area_level_2")) {
+  //                     cityName = component.long_name;
+  //                   }
+  //                   if (!cityName && component.types.includes("administrative_area_level_1")) {
+  //                     cityName = component.long_name;
+  //                   }
+  //                 }
+  //
+  //                 if (cityName) {
+  //                   setCity(cityName);
+  //                 }
+  //               }
+  //             }
+  //           );
+  //         },
+  //         (error) => {
+  //           setIsLoadingLocation(false);
+  //           console.log("Geolocation error:", error.message);
+  //         },
+  //         { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 }
+  //       );
+  //     } else {
+  //       setIsLoadingLocation(false);
+  //     }
+  //   };
+  //
+  //   getCurrentCity();
+  // }, [googleMapsLoaded, city]);
 
   // Get city suggestions from Google Places
   const getCitySuggestions = useCallback((input: string) => {
