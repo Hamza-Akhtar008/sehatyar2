@@ -87,12 +87,12 @@ export default function Carousel() {
   // Handle click on specialist to navigate to doctor search page
   const handleSpecialistClick = (specialistName: string) => {
     router.push(
-      `/doctor?query=${encodeURIComponent(specialistName)}&city=${encodeURIComponent(city || '')}`
+      `/doctor?query=${encodeURIComponent(specialistName)}&city=${encodeURIComponent(city ||'Abbottabad')}`
     )
   }
 
   return (
-    <div className="w-full flex justify-center py-10 px-4">
+    <div className="w-full flex justify-center pt-8 md:pt-10 pb-0 px-4 mb-0 md:mb-8">
       <div className="relative bg-[#4E148C] rounded-[22px] px-[20px] md:px-[20px] py-[30px] md:py-[40px] max-w-[1370px] w-full group/carousel">
         
         {/* Mobile Layout - 2 rows x 3 columns grid carousel */}

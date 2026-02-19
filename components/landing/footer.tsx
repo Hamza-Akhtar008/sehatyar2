@@ -11,15 +11,15 @@ export default function Footer() {
                 <p className='mt-6 text-[15px] leading-relaxed text-[#66627f]'>
                     Sehatyar is a complete hospital and clinic management system offering smart appointment scheduling, online consultations, seamless billing, and comprehensive healthcare management across Abbottabad, Mansehra, Haripur, and Battagram.
                 </p>
-            </div>Lahore
+            </div>
 
             {/* Desktop Layout */}
             <div className='hidden md:flex md:gap-6 lg:gap-10 xl:gap-16'>
-                {/* Logo and Description - Desktop */}
+                {/* Logo and Description - Deskotop */}
                 <div className='md:w-[35%] lg:w-[30%]'>
-                    <Image src="/images/logo.svg" width={240} height={80} alt="sehatyar-logo"/>
+                    <Image src="/images/logo.svg" width={200} height={60} alt="sehatyar-logo"/>
                    
-                    <p className='mt-3 text-[15px] leading-relaxed text-[#66627f]'>
+                    <p className='mt-3 text-[15px] leading-relaxed text-[#66627f] mt-3'>
                         Sehatyar is a complete hospital and clinic management system offering smart appointment scheduling, online consultations, seamless billing, and comprehensive healthcare management across Abbottabad, Mansehra, Haripur, and Battagram.
                     </p>
                 </div>
@@ -48,14 +48,14 @@ export default function Footer() {
                 </div>
 
                 {/* Feature Cards - Desktop */}
-                <div className='flex flex-col gap-4 md:w-[35%] lg:w-[30%]'>
+                <div className='flex flex-col gap-5 md:w-[28%] lg:w-[24%]'>
                     {/* PMDC Verified Doctors */}
-                    <div className='flex items-center bg-[#F9F9F9] rounded-full p-4 gap-4'>
-                        <div className='flex-shrink-0'>
+                    <div className='flex items-center bg-[#F9F9F9] rounded-full py-3.5 px-3 gap-2.5'>
+                        <div className='flex-shrink-0 ml-1'>
                             <Image 
                                 src="/images/one.svg" 
-                                width={45} 
-                                height={45} 
+                                width={28} 
+                                height={28} 
                                 alt="tick-icon"
                                 style={{ filter: 'invert(56%) sepia(53%) saturate(2644%) hue-rotate(342deg) brightness(101%) contrast(101%)' }}
                             />
@@ -67,9 +67,9 @@ export default function Footer() {
                     </div>
 
                     {/* Reliable Customer Support */}
-                    <div className='flex items-center bg-[#ff6600] rounded-full p-4 gap-4'>
-                        <div className='flex-shrink-0'>
-                            <Image src="/images/two.svg" width={45} height={45} alt="support-icon" className="brightness-0 invert"/>
+                    <div className='flex items-center bg-[#ff6600] rounded-full py-3.5 px-3 gap-2.5'>
+                        <div className='flex-shrink-0 ml-1'>
+                            <Image src="/images/two.svg" width={28} height={28} alt="support-icon" className="brightness-0 invert"/>
                         </div>
                         <div className='flex flex-col'>
                             <h3 className='text-sm text-white font-bold '>Reliable Customer Support</h3>
@@ -78,19 +78,19 @@ export default function Footer() {
                     </div>
 
                     {/* Secure Online Payment */}
-                    <div className='flex items-center bg-[#F9F9F9] rounded-full p-4 gap-4'>
-                        <div className='flex-shrink-0'>
+                    <div className='flex items-center bg-[#F9F9F9] rounded-full py-3.5 px-3 gap-2.5'>
+                        <div className='flex-shrink-0 ml-1'>
                             <Image 
                                 src="/images/three.svg" 
-                                width={45} 
-                                height={45} 
+                                width={28} 
+                                height={28} 
                                 alt="security-icon"
                                 style={{ filter: 'invert(56%) sepia(53%) saturate(2644%) hue-rotate(342deg) brightness(101%) contrast(101%)' }}
                             />
                         </div>
                         <div className='flex flex-col'>
-                            <h3 className='text-sm text-[#FF6B35] font-bold mb-1'>Secure Online Payment</h3>
-                            <p className='text-[13px] text-[#66627f]'>Secure checkout using SSL Certificate</p>
+                            <h3 className='text-[13px] text-[#FF6B35] font-bold leading-tight'>Secure Online Payment</h3>
+                            <p className='text-[11px] text-[#66627f]'>Secure checkout</p>
                         </div>
                     </div>
                 </div>
@@ -123,49 +123,49 @@ export default function Footer() {
             </div>
 
             {/* Feature Cards - Mobile */}
-            <div className='md:hidden flex flex-col gap-4'>
+            <div className='md:hidden flex flex-col gap-5'>
                 {/* PMDC Verified Doctors */}
-                <div className='flex items-center bg-[#F9F9F9] rounded-full p-4 gap-4'>
-                    <div className='flex-shrink-0'>
+                <div className='flex items-center bg-[#F9F9F9] rounded-full py-3 px-2.5 gap-2.5'>
+                    <div className='flex-shrink-0 ml-1'>
                         <Image 
                             src="/images/one.png" 
-                            width={40} 
-                            height={40} 
+                            width={24} 
+                            height={24} 
                             alt="tick-icon"
                             style={{ filter: 'invert(56%) sepia(53%) saturate(2644%) hue-rotate(342deg) brightness(101%) contrast(101%)' }}
                         />
                     </div>
                     <div className='flex flex-col'>
-                        <h3 className='text-sm text-[#FF6B35] font-bold mb-1'>PMDC Verified Doctors</h3>
-                        <p className='text-[12px] text-[#66627f]'>Authentic & updates information</p>
+                        <h3 className='text-[10px] sm:text-[11px] text-[#FF6B35] font-bold leading-tight'>PMDC Verified Doctors</h3>
+                        <p className='text-[9px] text-[#66627f]'>Authentic information</p>
                     </div>
                 </div>
 
                 {/* Reliable Customer Support */}
-                <div className='flex items-center bg-[#FF6B35] rounded-full p-4 gap-4'>
-                    <div className='flex-shrink-0'>
-                        <Image src="/images/two.svg" width={40} height={40} alt="support-icon" className="brightness-0 invert"/>
+                <div className='flex items-center bg-[#FF6B35] rounded-full py-3 px-2.5 gap-2.5'>
+                    <div className='flex-shrink-0 ml-1'>
+                        <Image src="/images/two.svg" width={24} height={24} alt="support-icon" className="brightness-0 invert"/>
                     </div>
                     <div className='flex flex-col'>
-                        <h3 className='text-sm text-white font-bold mb-1'>Reliable Customer Support</h3>
-                        <p className='text-[12px] text-white'>7 days a week</p>
+                        <h3 className='text-[10px] sm:text-[11px] text-white font-bold leading-tight'>Reliable Customer Support</h3>
+                        <p className='text-[9px] text-white'>7 days a week</p>
                     </div>
                 </div>
 
                 {/* Secure Online Payment */}
-                <div className='flex items-center bg-[#F9F9F9] rounded-full p-4 gap-4'>
-                    <div className='flex-shrink-0'>
+                <div className='flex items-center bg-[#F9F9F9] rounded-full py-3 px-2.5 gap-2.5'>
+                    <div className='flex-shrink-0 ml-1'>
                         <Image 
                             src="/images/three.svg" 
-                            width={40} 
-                            height={40} 
+                            width={24} 
+                            height={24} 
                             alt="security-icon"
                             style={{ filter: 'invert(56%) sepia(53%) saturate(2644%) hue-rotate(342deg) brightness(101%) contrast(101%)' }}
                         />
                     </div>
                     <div className='flex flex-col'>
-                        <h3 className='text-sm text-[#FF6B35] font-bold mb-1'>Secure Online Payment</h3>
-                        <p className='text-[12px] text-[#66627f]'>Secure checkout using SSL Certificate</p>
+                        <h3 className='text-[10px] sm:text-[11px] text-[#FF6B35] font-bold leading-tight'>Secure Online Payment</h3>
+                        <p className='text-[9px] text-[#66627f]'>Secure checkout</p>
                     </div>
                 </div>
             </div>

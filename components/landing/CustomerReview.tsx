@@ -48,6 +48,14 @@ export default function CustomerReview() {
   ]
 
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [isMobile, setIsMobile] = React.useState(false)
+
+  React.useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768)
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   const handlePrev = () => {
     setCurrentIndex((prev) => (prev === 0 ? reviews.length - 1 : prev - 1))
@@ -59,9 +67,10 @@ export default function CustomerReview() {
 
   const getVisibleReviews = () => {
     const items = []
-    for (let i = 0; i < 3; i++) {
-      const index = (currentIndex + i) % reviews.length
-      items.push(reviews[index])
+    const count = isMobile ? 1 : 3
+    for (let i = 0; i < count; i++) {
+        const index = (currentIndex + i) % reviews.length
+        items.push(reviews[index])
     }
     return items
   }
@@ -69,7 +78,7 @@ export default function CustomerReview() {
   const visibleReviews = getVisibleReviews()
 
   return (
-    <div className='w-full flex justify-center py-14 md:py-2 lg:pb-20 px-4 mb-0 md:mb-14'>
+    <div className='w-full flex justify-center py-6 md:py-2 lg:pb-20 px-4 mb-0 md:mb-12'>
         <div className='w-full max-w-[1370px] bg-[#F3F3F3] rounded-[40px] p-6 md:p-12'>
             {/* Header */}
             <div className='flex flex-col md:flex-row justify-between items-start md:items-center mb-8 md:mb-12'>
@@ -100,20 +109,20 @@ export default function CustomerReview() {
             {/* Reviews Grid */}
             <div className='relative'>
                 {/* Left Shadow */}
-                <div className='absolute left-0 top-0 bottom-0 w-8 md:w-20 bg-gradient-to-r from-[#F3F3F3] to-transparent z-10 pointer-events-none' />
+                <div className='hidden md:block absolute left-0 top-0 bottom-0 w-8 md:w-20 bg-gradient-to-r from-[#F3F3F3] to-transparent z-10 pointer-events-none' />
                 
                 {/* Right Shadow */}
-                <div className='absolute right-0 top-0 bottom-0 w-8 md:w-20 bg-gradient-to-l from-[#F3F3F3] to-transparent z-10 pointer-events-none' />
+                <div className='hidden md:block absolute right-0 top-0 bottom-0 w-8 md:w-20 bg-gradient-to-l from-[#F3F3F3] to-transparent z-10 pointer-events-none' />
 
-                <div className='flex md:grid md:grid-cols-3 gap-6 overflow-hidden'>
+                <div className={`${isMobile ? 'flex justify-center' : 'grid md:grid-cols-3'} gap-6 overflow-hidden`}>
                 {visibleReviews.map((review, index) => {
-                    const isActive = index === 1 // Middle card is active
+                    const isActive = isMobile ? true : index === 1 // Middle card is active on desktop, only card on mobile
                     return (
                         <div 
                             key={review.id} 
-                            className={`min-w-[85%] md:min-w-0 p-6 md:p-8 rounded-3xl transition-all duration-300 ${
+                            className={`w-full md:min-w-0 p-6 md:p-8 rounded-3xl transition-all duration-300 ${
                                 isActive 
-                                ? 'bg-white border border-[#421B75] shadow-sm' 
+                                ? 'bg-white border border-[#421B75] shadow-md' 
                                 : 'bg-[#ededed] border border-transparent'
                             }`}
                         >
@@ -122,20 +131,20 @@ export default function CustomerReview() {
                                 {[...Array(5)].map((_, i) => (
                                     <FaStar 
                                         key={i} 
-                                        size={20} 
+                                        size={isMobile ? 16 : 18} 
                                         className={i < review.rating ? 'text-[#FF7A00]' : 'text-gray-300'} 
                                     />
                                 ))}
                             </div>
 
                             {/* Text */}
-                            <p className='text-gray-500 text-[15px] leading-relaxed mb-8 min-h-[80px]'>
-                                {review.text}
+                            <p className='text-gray-500 text-[14px] md:text-[15px] leading-relaxed mb-6 md:mb-8 min-h-[70px] md:min-h-[80px] italic'>
+                                "{review.text}"
                             </p>
 
                             {/* User Info */}
-                            <div className='flex items-center gap-4'>
-                                <div className='relative w-14 h-14 rounded-full overflow-hidden'>
+                            <div className='flex items-center gap-3 md:gap-4'>
+                                <div className={`relative ${isMobile ? 'w-12 h-12' : 'w-14 h-14'} rounded-full overflow-hidden flex-shrink-0`}>
                                     <Image 
                                         src={review.image} 
                                         alt={review.name} 
@@ -143,9 +152,9 @@ export default function CustomerReview() {
                                         className='object-cover'
                                     />
                                 </div>
-                                <div>
-                                    <h4 className='text-[#421B75] font-bold text-[16px]'>{review.name}</h4>
-                                    <p className='text-gray-500 text-[13px]'>{review.role}</p>
+                                 <div>
+                                    <h4 className='text-[#421B75] font-bold text-sm md:text-base'>{review.name}</h4>
+                                    <p className='text-gray-400 text-xs md:text-[13px]'>{review.role}</p>
                                 </div>
                             </div>
                         </div>
@@ -155,16 +164,16 @@ export default function CustomerReview() {
             </div>
 
             {/* Mobile Navigation Buttons */}
-            <div className='flex md:hidden gap-3 mt-8'>
+            <div className='flex md:hidden gap-3 mt-8 justify-center'>
                 <button 
                     onClick={handlePrev}
-                    className='w-12 h-12 rounded-full bg-[#421B75] text-white flex items-center justify-center hover:bg-[#FF7A00] transition-colors'
+                    className='w-10 h-10 rounded-full bg-[#421B75] text-white flex items-center justify-center active:scale-95 transition-all shadow-md'
                 >
-                    <FaChevronLeft size={16} />
+                    <FaChevronLeft size={14} />
                 </button>
                 <button 
                     onClick={handleNext}
-                    className='w-12 h-12 rounded-full bg-[#421B75] text-white flex items-center justify-center hover:bg-[#FF7A00] transition-colors'
+                    className='w-10 h-10 rounded-full bg-[#421B75] text-white flex items-center justify-center active:scale-95 transition-all shadow-md'
                 >
                     <FaChevronRight size={16} />
                 </button>

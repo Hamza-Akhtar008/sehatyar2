@@ -3,7 +3,7 @@ import Image from 'next/image'
 
 export default function DoctorByCondition() {
   return (
-    <div className='w-full flex justify-center pt-10 pb-0 md:pt-20 lg:pt-9 px-2 relative z-10'>
+    <div className='w-full flex justify-center pt-1 pb-0 md:pt-10 lg:pt-9 px-2 relative z-10'>
         <div className='w-full max-w-[1370px] relative'>
             <div className='flex bg-[#4e148c] py-10 xl:py-[60px] md:px-[90px] px-5 rounded-[32px] relative overflow-visible'>
                 {/* Left content — fixed width so phone doesn't push it */}

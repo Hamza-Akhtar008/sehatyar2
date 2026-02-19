@@ -88,13 +88,13 @@ export default function ConditionCardCarousel() {
   // Handle click on condition to navigate to doctor search page
   const handleConditionClick = (conditionName: string) => {
     router.push(
-      `/doctor?query=${encodeURIComponent(conditionName)}&city=${encodeURIComponent(city || '')}`
+      `/doctor?query=${encodeURIComponent(conditionName)}&city=${encodeURIComponent(city || 'Abbottabad')}`
     )
   }
 
   return (
-    <section className="w-full flex mt-20 justify-center items-center py-10 px-4 md:h-[513px]">
-      <div className="bg-[#f4f4f4] rounded-[22px] md:rounded-[42px] px-[20px] md:px-[66px] py-[30px] md:py-[40px] max-w-[1370px] w-full flex flex-col gap-6 md:gap-10">
+    <section className="w-full flex mt-2 md:mt-6 lg:mt-1 justify-center items-center py-2 md:py-10 px-4 md:h-[513px]">
+      <div className="bg-[#f4f4f4] rounded-[22px] md:rounded-[42px] px-[20px] md:px-[66px] py-[20px] md:py-[40px] max-w-[1370px] w-full flex flex-col gap-6 md:gap-10">
         
         {/* Header Section */}
     <div className="w-full">
@@ -102,7 +102,7 @@ export default function ConditionCardCarousel() {
         <h2 className="text-2xl md:text-4xl font-bold text-[#4e148c]">
           Doctor by <span className="text-[#ff6600]">Condition</span>
         </h2>
-        <Button className="bg-[#4E148C] text-white rounded-full hover:bg-[#ff6600] px-6 md:px-8 py-2 md:py-6 text-base md:text-lg">
+        <Button className="bg-[#4E148C] text-white rounded-full hover:bg-[#ff6600] px-5 md:px-10 py-1.5 md:py-3 text-[13px] md:text-base h-auto min-h-[32px] font-medium shadow-md transition-all active:scale-95">
           View All
         </Button>
       </div>
@@ -111,12 +111,8 @@ export default function ConditionCardCarousel() {
         Quickly find the right specialists for common conditions and get trusted medical care when you need it.
       </p>
     </div>
-        {/* Icons Section */}
         <div className="relative bg-[#4E148C] rounded-[22px] px-[20px] md:px-[20px] py-[30px] md:py-[40px] w-full group/carousel">
-          
-          {/* Mobile Layout - 2 rows x 3 columns grid carousel */}
           <div className="md:hidden relative">
-            {/* Mobile Left Arrow */}
             {mobileShowLeft && (
               <button
                 onClick={() => mobileScroll('left')}

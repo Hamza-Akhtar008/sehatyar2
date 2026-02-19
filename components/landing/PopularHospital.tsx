@@ -54,7 +54,7 @@ const PopularHospital = () => {
   };
 
   return (
-    <section className="relative max-w-[1370px] mt-8 mx-auto py-16 px-8 md:px-12 lg:px-16 overflow-hidden bg-[#f5f5f5] rounded-[30px] mb-6">
+    <section className="relative max-w-[1370px] mt-4 md:mt-8 lg:mt-16 mx-auto py-8 md:py-16 lg:py-24 px-8 md:px-12 lg:px-16 overflow-hidden bg-[#f5f5f5] rounded-[30px] mb-4 md:mb-6">
       {/* Background SVG */}
       <div className="absolute inset-0 pointer-events-none">
         <Image
@@ -145,17 +145,17 @@ const PopularHospital = () => {
         <div className="flex md:hidden justify-center gap-3 mt-8">
           <button
             onClick={() => scroll('left')}
-            className="w-12 h-12 rounded-full bg-[#4E148C] text-white flex items-center justify-center hover:bg-[#ff6600] transition-all duration-300 shadow-lg hover:shadow-xl"
+            className="w-10 h-10 rounded-full bg-[#4E148C] text-white flex items-center justify-center hover:bg-[#ff6600] transition-all duration-300 shadow-lg hover:shadow-xl"
             aria-label="Previous"
           >
-            <ChevronLeft className="w-6 h-6" />
+            <ChevronLeft className="w-5 h-5" />
           </button>
           <button
             onClick={() => scroll('right')}
-            className="w-12 h-12 rounded-full bg-[#4E148C] text-white flex items-center justify-center hover:bg-[#ff6600] transition-all duration-300 shadow-lg hover:shadow-xl"
+            className="w-10 h-10 rounded-full bg-[#4E148C] text-white flex items-center justify-center hover:bg-[#ff6600] transition-all duration-300 shadow-lg hover:shadow-xl"
             aria-label="Next"
           >
-            <ChevronRight className="w-6 h-6" />
+            <ChevronRight className="w-5 h-5" />
           </button>
         </div>
       </div>

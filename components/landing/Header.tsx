@@ -163,7 +163,7 @@ export default function Header() {
                 width={200}
                 height={52}
                 priority
-                className="h-[52px] w-auto" 
+                className="h-[38px] md:h-[52px] w-auto" 
               />
             </Link>
           </div>
@@ -345,10 +345,10 @@ export default function Header() {
           <div className="lg:hidden flex items-center gap-3">
             <Link
               href="/register"
-              className="pl-4 pr-2 py-2 bg-[#4E148C] text-white hover:bg-[#ff6600] rounded-full text-sm font-medium transition-colors flex items-center gap-2"
+              className="pl-3 sm:pl-4 pr-1 sm:pr-2 py-1.5 sm:py-2 bg-[#4E148C] text-white hover:bg-[#ff6600] rounded-full text-[11px] sm:text-sm font-medium transition-colors flex items-center gap-1.5 sm:gap-2"
             >
               Join as Doctor
-              <svg width="24" height="24" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <svg width="20" height="20" className="sm:w-[24px] sm:h-[24px]" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect width="44" height="44" rx="22" fill="white"/>
                 <path d="M18.5919 23.8798L25.4073 20.1197M25.4073 20.1197L21.3475 18.8036M25.4073 20.1197L24.3556 24.256" stroke="#4E148C" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>

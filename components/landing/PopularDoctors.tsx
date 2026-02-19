@@ -40,7 +40,7 @@ export default function PopularDoctors() {
   }
 
   return (
-    <section className="w-full flex justify-center py-10 px-4">
+    <section className="w-full flex justify-center pt-0 md:pt-2 lg:pt-4 pb-4 md:pb-10 lg:pb-20 px-4">
       <div className="relative bg-[#F4F4F4] rounded-[22px] md:rounded-[42px] overflow-hidden max-w-[1370px] w-full">
         {/* Background Image */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -102,15 +102,15 @@ export default function PopularDoctors() {
           <div className="flex justify-center gap-3 mt-8">
             <button
               onClick={scrollLeft}
-              className="w-10 h-10 rounded-full flex items-center justify-center transition-all bg-[#4E148C] text-white hover:bg-[#ff6600]"
+              className="w-9 h-9 rounded-full flex items-center justify-center transition-all bg-[#4E148C] text-white hover:bg-[#ff6600]"
             >
-              <ChevronLeft size={20} />
+              <ChevronLeft size={18} />
             </button>
             <button
               onClick={scrollRight}
-              className="w-10 h-10 rounded-full flex items-center justify-center transition-all bg-[#4E148C] text-white hover:bg-[#ff6600]"
+              className="w-9 h-9 rounded-full flex items-center justify-center transition-all bg-[#4E148C] text-white hover:bg-[#ff6600]"
             >
-              <ChevronRight size={20} />
+              <ChevronRight size={18} />
             </button>
           </div>
         </div>
