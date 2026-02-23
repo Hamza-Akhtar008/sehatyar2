@@ -214,10 +214,10 @@ const LoginPage = () => {
             {/* Sign In Button */}
             <button
               type="submit"
-              className="w-full max-w-[400px] lg:max-w-[480px] h-[56px] rounded-full font-medium text-[16px] text-white bg-[#4e148c] mb-4 disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 transition-opacity"
+              className="btn-wipe-up w-full max-w-[400px] lg:max-w-[480px] h-[56px] rounded-full font-medium text-[16px] text-white bg-[#4e148c] mb-4 disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 transition-opacity"
               disabled={isLoading}
             >
-              {isLoading ? "Signing in..." : "Sign in"}
+              <span className="relative z-10">{isLoading ? "Signing in..." : "Sign in"}</span>
             </button>
             {/* Sign Up Link */}
             <div className="text-center mb-6 max-w-[400px]">

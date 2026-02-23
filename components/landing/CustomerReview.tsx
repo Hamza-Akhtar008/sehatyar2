@@ -83,7 +83,7 @@ export default function CustomerReview() {
             {/* Header */}
             <div className='flex flex-col md:flex-row justify-between items-start md:items-center mb-8 md:mb-12'>
                 <div>
-                    <h2 className='text-3xl md:text-5xl font-bold mb-4 md:mb-0'>
+                    <h2 className='text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-0'>
                         <span className='text-[#421B75]'>Testimonials</span> <span className='text-[#FF7A00]'>Users</span>
                     </h2>
                     <p className='text-[#5C5C5C] text-base md:text-lg mt-2 max-w-md md:hidden'>
@@ -93,15 +93,15 @@ export default function CustomerReview() {
                 <div className='hidden md:flex gap-3'>
                     <button 
                         onClick={handlePrev}
-                        className='w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#421B75] text-white flex items-center justify-center hover:bg-[#FF7A00] transition-colors'
+                        className='btn-wipe-up w-9 h-9 rounded-full bg-[#421B75] text-white flex items-center justify-center'
                     >
-                        <FaChevronLeft size={16} />
+                        <FaChevronLeft size={14} className='relative z-10' />
                     </button>
                     <button 
                         onClick={handleNext}
-                        className='w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#421B75] text-white flex items-center justify-center hover:bg-[#FF7A00] transition-colors'
+                        className='btn-wipe-up w-9 h-9 rounded-full bg-[#421B75] text-white flex items-center justify-center'
                     >
-                        <FaChevronRight size={16} />
+                        <FaChevronRight size={14} className='relative z-10' />
                     </button>
                 </div>
             </div>
@@ -167,15 +167,15 @@ export default function CustomerReview() {
             <div className='flex md:hidden gap-3 mt-8 justify-center'>
                 <button 
                     onClick={handlePrev}
-                    className='w-10 h-10 rounded-full bg-[#421B75] text-white flex items-center justify-center active:scale-95 transition-all shadow-md'
+                    className='btn-wipe-up w-9 h-9 rounded-full bg-[#421B75] text-white flex items-center justify-center shadow-md'
                 >
-                    <FaChevronLeft size={14} />
+                    <FaChevronLeft size={14} className='relative z-10' />
                 </button>
                 <button 
                     onClick={handleNext}
-                    className='w-10 h-10 rounded-full bg-[#421B75] text-white flex items-center justify-center active:scale-95 transition-all shadow-md'
+                    className='btn-wipe-up w-9 h-9 rounded-full bg-[#421B75] text-white flex items-center justify-center shadow-md'
                 >
-                    <FaChevronRight size={16} />
+                    <FaChevronRight size={14} className='relative z-10' />
                 </button>
             </div>
         </div>

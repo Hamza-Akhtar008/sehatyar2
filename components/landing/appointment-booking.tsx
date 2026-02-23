@@ -8,7 +8,7 @@ import { useEffect, useState } from "react"
 import { getDoctorProfileByDoctorId } from "@/lib/Api/Doctor/doctor_api"
 import { getAvailability, type Slot as AvailabilitySlot } from "@/lib/availability"
 import { useRef } from "react"
-import { ChevronLeft, ChevronRight } from "lucide-react"
+import { ChevronLeft, ChevronRight, ChevronDown } from "lucide-react"
 
 interface DoctorProfile {
   id: number
@@ -58,8 +58,6 @@ interface DayAvailability {
   dayName: string
   hospitals: HospitalAvailability[]
 }
-
-// Helper function to generate 30-minute time slots
 const generateTimeSlots = (startTime: string, endTime: string): string[] => {
   const slots: string[] = []
   const [startHour, startMin] = startTime.split(":").map(Number)
@@ -402,7 +400,7 @@ export default function AppointmentBooking() {
   if (loading) {
     return (
       <main className="w-full min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4e148c]"></div>
       </main>
     )
   }
@@ -515,7 +513,7 @@ export default function AppointmentBooking() {
             </div>
 
             {[1, 2, 3].map((i) => (
-              <Card key={i} className="rounded-xl bg-[#F8F8F8]">
+              <Card key={i} className="rounded-xl bg-[#F8F8F8] border-0 shadow-none">
                 <CardContent className="p-4">
                   <div className="text-[#111827] font-semibold text-sm mb-1">I recommend the doctor</div>
                   <div className="text-xs text-[#6B7280] mb-2">"Very good"</div>
@@ -532,7 +530,7 @@ export default function AppointmentBooking() {
                 className="flex items-center gap-2 border border-[#414141] rounded-[10px] px-4 py-2 text-[#414141] text-[13px] bg-white hover:bg-[#F3F4F6] transition-colors"
                 type="button"
               >
-                <Image src="/downarrow.svg" alt="Down Arrow" width={16} height={16} />
+                <ChevronDown className="w-4 h-4" />
                 Load More Reviews
               </button>
             </div>
@@ -656,7 +654,7 @@ export default function AppointmentBooking() {
             </div>
 
             {[1, 2, 3].map((i) => (
-              <Card key={i} className="rounded-2xl bg-[#F8F8F8]">
+              <Card key={i} className="rounded-2xl bg-[#F8F8F8] border-0 shadow-none">
                 <CardContent className="p-5">
                   <div className="text-[#111827] font-semibold mb-2">I recommend the doctor</div>
                   <div className="text-sm text-[#6B7280] mb-3">"Very good"</div>
@@ -673,7 +671,7 @@ export default function AppointmentBooking() {
                 className="flex items-center gap-2 border border-[#414141] rounded-[12px] px-6 py-2 text-[#414141] text-[14px] bg-white hover:bg-[#F3F4F6] transition-colors"
                 type="button"
               >
-                <Image src="/downarrow.svg" alt="Down Arrow" width={18} height={18} />
+                <ChevronDown className="w-[18px] h-[18px]" />
                 Load More Reviews
               </button>
             </div>

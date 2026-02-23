@@ -80,17 +80,17 @@ const PopularHospital = () => {
           <div className="hidden md:flex gap-3">
             <button
               onClick={() => scroll('left')}
-              className="w-12 h-12 rounded-full bg-[#4E148C] text-white flex items-center justify-center hover:bg-[#ff6600] transition-all duration-300 shadow-lg hover:shadow-xl"
+              className="btn-wipe-up w-9 h-9 rounded-full bg-[#4E148C] text-white flex items-center justify-center shadow-lg"
               aria-label="Previous"
             >
-              <ChevronLeft className="w-6 h-6" />
+              <ChevronLeft className="w-5 h-5 relative z-10" />
             </button>
             <button
               onClick={() => scroll('right')}
-              className="w-12 h-12 rounded-full bg-[#4E148C] text-white flex items-center justify-center hover:bg-[#ff6600] transition-all duration-300 shadow-lg hover:shadow-xl"
+              className="btn-wipe-up w-9 h-9 rounded-full bg-[#4E148C] text-white flex items-center justify-center shadow-lg"
               aria-label="Next"
             >
-              <ChevronRight className="w-6 h-6" />
+              <ChevronRight className="w-5 h-5 relative z-10" />
             </button>
           </div>
         </div>
@@ -145,17 +145,17 @@ const PopularHospital = () => {
         <div className="flex md:hidden justify-center gap-3 mt-8">
           <button
             onClick={() => scroll('left')}
-            className="w-10 h-10 rounded-full bg-[#4E148C] text-white flex items-center justify-center hover:bg-[#ff6600] transition-all duration-300 shadow-lg hover:shadow-xl"
+            className="btn-wipe-up w-9 h-9 rounded-full bg-[#4E148C] text-white flex items-center justify-center shadow-lg"
             aria-label="Previous"
           >
-            <ChevronLeft className="w-5 h-5" />
+            <ChevronLeft className="w-5 h-5 relative z-10" />
           </button>
           <button
             onClick={() => scroll('right')}
-            className="w-10 h-10 rounded-full bg-[#4E148C] text-white flex items-center justify-center hover:bg-[#ff6600] transition-all duration-300 shadow-lg hover:shadow-xl"
+            className="btn-wipe-up w-9 h-9 rounded-full bg-[#4E148C] text-white flex items-center justify-center shadow-lg"
             aria-label="Next"
           >
-            <ChevronRight className="w-5 h-5" />
+            <ChevronRight className="w-5 h-5 relative z-10" />
           </button>
         </div>
       </div>

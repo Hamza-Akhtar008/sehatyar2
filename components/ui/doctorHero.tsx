@@ -55,7 +55,7 @@ interface Doctor {
   education?: Education[];               // new API array
   languages?: string[];
   availableForVideoConsultation: boolean;
-  user : { fullName: string; }
+  user : { fullName: string; city?: string; country?: string; }
   rating?: number;
   reviewCount?: number;
   reviews?: { rating?: number }[];       // new API array
@@ -166,6 +166,11 @@ const DoctorCard = ({ doctor }: { doctor: Doctor }) => {
       ? Number(feeVal).toLocaleString()
       : '1500';
 
+  const doctorLocation = [
+    doctor.user?.city || doctor.city,
+    doctor.user?.country || doctor.country
+  ].filter(Boolean).join(', ');
+
   return (
     <div className="bg-[#F8F8F8] rounded-3xl p-6 sm:p-7 md:p-8 cursor-pointer hover:shadow-lg transition-shadow duration-300" onClick={handleClick}>
       <div className="flex flex-col lg:flex-row items-start gap-5 lg:gap-8">
@@ -191,11 +196,14 @@ const DoctorCard = ({ doctor }: { doctor: Doctor }) => {
             {/* Name */}
             <h2 className="text-xl sm:text-2xl lg:text-[1.65rem] font-semibold text-[#2D2D2D]">{fullName}</h2>
 
-            {/* PMDC Verified Badge */}
-            <div className="flex items-center justify-center lg:justify-start">
-              <span className="inline-flex items-center text-xs py-0.5 px-2">
-                <span className={`w-2 h-2 ${doctor.verified !== false ? 'bg-[#4e148c]' : 'bg-gray-400'} rounded-full mr-1.5`}></span>
-                <span className="text-[#] font-medium">{doctor.verified !== false ? 'PMDC Verified' : 'Not Verified'}</span>
+            {/* Location & PMDC Verified Badge */}
+            <div className="flex items-center justify-center lg:justify-start -ml-1">
+              <span className="inline-flex items-center text-xs py-0.5 px-1">
+                <span className={`w-2 h-2 shrink-0 ${doctor.verified !== false ? 'bg-[#4e148c]' : 'bg-gray-400'} rounded-full mr-1.5`}></span>
+                <span className="text-[#5B5B5B] font-medium">
+                  {doctorLocation ? `${doctorLocation} | ` : ''}
+                  {doctor.verified !== false ? 'PMDC Verified' : 'Not Verified'}
+                </span>
               </span>
             </div>
 
@@ -235,18 +243,18 @@ const DoctorCard = ({ doctor }: { doctor: Doctor }) => {
           <div className="flex flex-col gap-2.5 items-center lg:items-end w-full lg:w-auto">
             <button 
               onClick={handleVideoConsultation}
-              className="w-full lg:w-[200px] inline-flex items-center justify-center gap-2 whitespace-nowrap py-2.5 px-5 text-sm font-medium border border-[#E5E5E5] text-[#2D2D2D] rounded-full bg-white hover:bg-[#ff6600] hover:text-white hover:border-[#ff6600] transition-all duration-200"
+              className="btn-wipe-up w-full lg:w-[200px] inline-flex items-center justify-center gap-2 whitespace-nowrap py-2.5 px-5 text-sm font-medium border border-[#E5E5E5] text-[#2D2D2D] rounded-full bg-white hover:text-white hover:border-[#ff6600] transition-colors duration-300"
             >
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 relative z-10" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
               </svg>
-              Video Consultation
+              <span className="relative z-10">Video Consultation</span>
             </button>
             <button 
               onClick={handleBookAppointment}
-              className="w-full lg:w-[200px] inline-flex items-center justify-center whitespace-nowrap bg-[#4e148c] hover:bg-[#ff6600] text-white rounded-full py-2.5 px-5 text-sm font-medium transition-colors duration-200"
+              className="btn-wipe-up w-full lg:w-[200px] inline-flex items-center justify-center whitespace-nowrap bg-[#4e148c] text-white rounded-full py-2.5 px-5 text-sm font-medium"
             >
-              Book an Appointment
+              <span className="relative z-10">Book an Appointment</span>
             </button>
           </div>
         </div>
@@ -317,9 +325,9 @@ export default function DoctorHero({ doctors, loading = false, specialization = 
           {filterButtons.map((text, index) => (
             <button 
               key={index} 
-              className='text-xs sm:text-sm py-2 sm:py-2 md:py-2.5 px-3 sm:px-4 md:px-5 border-[1px] text-gray-700 border-[#003F31] hover:bg-white rounded-3xl transition-colors'
+              className='btn-wipe-up text-xs sm:text-sm py-2 sm:py-2 md:py-2.5 px-3 sm:px-4 md:px-5 border-[1px] text-gray-700 hover:text-white border-[#003F31] hover:border-white rounded-3xl transition-colors duration-300'
             >
-              {text}
+              <span className="relative z-10">{text}</span>
             </button>
           ))}
         </div>

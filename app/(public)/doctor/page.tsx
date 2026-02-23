@@ -151,7 +151,6 @@ export default function Page() {
         setLoading(false)
       }
     }
-
     if (query || city) {
       fetchDoctors()
     } else {

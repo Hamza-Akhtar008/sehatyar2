@@ -291,7 +291,7 @@ export default function DoctorProfile() {
           {/* Right – booking cards or fallback */}
           <aside className="space-y-4">
             {doctor.availableForVideoConsultation && (
-              <Card className="rounded-xl bg-[#F8F8F8]">
+              <Card className="rounded-xl bg-[#F8F8F8] border border-[#E5E5E5] shadow-sm">
                 <CardHeader>
                   <CardTitle className="text-[#414141] text-[22px]">
                     Online Video Consultation
@@ -321,17 +321,17 @@ export default function DoctorProfile() {
                     <span>02:00 PM - 03:00 PM</span>
                   </div>
                   <Button
-                    className="w-full bg-[#4e148c] mt-2 py-6 hover:bg-[#ff6600] rounded-full text-white"
+                    className="btn-wipe-up w-full bg-[#4e148c] mt-2 py-6 rounded-full text-white"
                     onClick={() => router.push(`/book-appointment?doctorId=${doctor.id}&type=video`)}
                   >
-                    Book an Appointment
+                    <span className="relative z-10">Book an Appointment</span>
                   </Button>
                 </CardContent>
               </Card>
             )}
 
             {doctor.clinicName && (
-              <Card className="rounded-xl bg-[#F8F8F8]">
+              <Card className="rounded-xl bg-[#F8F8F8] border border-[#E5E5E5] shadow-sm">
                 <CardHeader>
                   <CardTitle className="text-[#414141] text-[22px]">{doctor.clinicName}</CardTitle>
                 </CardHeader>
@@ -360,10 +360,10 @@ export default function DoctorProfile() {
                     <span>02:00 PM - 03:00 PM</span>
                   </div>
                   <Button
-                    className="w-full bg-[#4e148c] mt-2 hover:bg-[#ff6600] py-6 rounded-full text-white"
+                    className="btn-wipe-up w-full bg-[#4e148c] mt-2 py-6 rounded-full text-white"
                     onClick={() => router.push(`/book-appointment?doctorId=${doctor.id}`)}
                   >
-                    Book an Appointment
+                    <span className="relative z-10">Book an Appointment</span>
                   </Button>
                 </CardContent>
               </Card>
@@ -373,7 +373,7 @@ export default function DoctorProfile() {
             {!(doctor.availableForVideoConsultation || doctor.clinicName) && (
               <>
                 {/* Static Online Video Consultation Card */}
-                <Card className="rounded-xl bg-[#F8F8F8]">
+                <Card className="rounded-xl bg-[#F8F8F8] border border-[#E5E5E5] shadow-sm">
                   <CardHeader>
                     <CardTitle className="text-[#414141] text-[22px]">
                       Online Video Consultation
@@ -402,14 +402,14 @@ export default function DoctorProfile() {
                       <span>02:00 PM - 03:00 PM</span>
                     </div>
                     <Button
-                      className="w-full bg-[#4e148c] mt-2 py-6 hover:bg-[#ff6600] rounded-full text-white"
+                      className="btn-wipe-up w-full bg-[#4e148c] mt-2 py-6 rounded-full text-white"
                     >
-                      Book an Appointment
+                      <span className="relative z-10">Book an Appointment</span>
                     </Button>
                   </CardContent>
                 </Card>
                 {/* Static Doctors Hospital Card */}
-                <Card className="rounded-xl bg-[#F8F8F8]">
+                <Card className="rounded-xl bg-[#F8F8F8] border border-[#E5E5E5] shadow-sm">
                   <CardHeader>
                     <CardTitle className="text-[#414141] text-[22px]">
                       Doctors Hospital
@@ -438,9 +438,9 @@ export default function DoctorProfile() {
                       <span>02:00 PM - 03:00 PM</span>
                     </div>
                     <Button
-                      className="w-full bg-[#4e148c] mt-2 hover:bg-[#ff6600] py-6 rounded-full text-white"
+                      className="btn-wipe-up w-full bg-[#4e148c] mt-2 py-6 rounded-full text-white"
                     >
-                      Book an Appointment
+                      <span className="relative z-10">Book an Appointment</span>
                     </Button>
                   </CardContent>
                 </Card>

@@ -54,16 +54,12 @@ export default function InClinicAppointment() {
   const [isLocationFocused, setIsLocationFocused] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
-  // City suggestions: show all hardcoded cities when empty, filter (max 5) when typing
   const citySuggestions = useMemo(() => {
     if (!location.trim()) return CITIES;
     return CITIES.filter((c) =>
       c.toLowerCase().includes(location.toLowerCase())
     ).slice(0, 5);
   }, [location]);
-
-  // Specialization suggestions: show popular 5 when empty, filter all (max 5) when typing
   const filteredSpecializations = useMemo(() => {
     if (!search.trim()) return POPULAR_SPECIALIZATIONS;
     return specializations
@@ -131,13 +127,15 @@ export default function InClinicAppointment() {
         <Button
           onClick={handleSearch}
           disabled={!location.trim() || !search.trim() || isLoading}
-          className="bg-[#4E148C] hover:bg-[#3b0f6b] text-white rounded-full px-5 sm:px-8 h-[48px] sm:h-[56px] text-sm sm:text-base font-medium shadow-none disabled:opacity-50 disabled:cursor-not-allowed"
+          className="btn-wipe-up bg-[#4E148C] text-white rounded-full px-5 sm:px-8 h-[48px] sm:h-[56px] text-sm sm:text-base font-medium shadow-none disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isLoading ? (
-            <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
-          ) : (
-            "Find"
-          )}
+          <span className="relative z-10 flex items-center justify-center gap-2">
+            {isLoading ? (
+              <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
+            ) : (
+              "Find"
+            )}
+          </span>
         </Button>
       </div>
 

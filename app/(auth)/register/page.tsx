@@ -960,7 +960,7 @@ for (let entry of formDataToSend.entries()) {
                 setPasswordError(null);
                 setStep(2);
               }}
-              className="w-full mt-6 h-[56px] rounded-full text-white font-semibold text-[18px] transition-colors hover:bg-[#3d1070]"
+              className="btn-wipe-up w-full mt-6 h-[56px] rounded-full text-white font-semibold text-[18px] transition-colors hover:bg-[#3d1070]"
               style={{ background: "#4e148c" }}
               disabled={
                 !(
@@ -975,27 +975,8 @@ for (let entry of formDataToSend.entries()) {
                 )
               }
             >
-              Next
+              <span className="relative z-10">Next</span>
             </button>
-            {/* Show error message if button is disabled */}
-            {(
-              !userFields.fullName.trim() ||
-              !userFields.country.trim() ||
-              !userFields.city.trim() ||
-              !userFields.email.trim() ||
-              !userFields.phoneNumber.trim() ||
-              !userFields.password.trim() ||
-              !userFields.confirmPassword.trim()
-            ) && (
-              <div className="w-full text-red-600 text-center text-sm font-medium mt-2 mb-2">
-                Please fill all fields to continue.
-              </div>
-            )}
-            {userFields.password !== userFields.confirmPassword && (
-              <div className="w-full text-red-600 text-center text-sm font-medium mt-2 mb-2">
-                Password and Confirm Password do not match.
-              </div>
-            )}
           </>
         )}
 
@@ -1200,7 +1181,7 @@ for (let entry of formDataToSend.entries()) {
               </button>
               <button
                 type="button"
-                className="flex-1 h-[48px] md:h-[54px] rounded-full text-white bg-[#551e91] font-semibold"
+                className="btn-wipe-up flex-1 h-[48px] md:h-[54px] rounded-full text-white bg-[#551e91] font-semibold"
                 onClick={handleRegister}
                 disabled={
                   !(
@@ -1214,25 +1195,21 @@ for (let entry of formDataToSend.entries()) {
                   loading // disable while loading
                 }
               >
-                {loading ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <span className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#003227]" />
-                    Submitting...
-                  </span>
-                ) : (
-                  "Submit"
-                )}
+                <span className="relative z-10">
+                  {loading ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <span className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
+                      Submitting...
+                    </span>
+                  ) : (
+                    "Submit"
+                  )}
+                </span>
               </button>
             </div>
-            {/* Show error message if button is disabled */}
-            {(
-              !formData.yearsOfExperience.trim() ||
-              formData.primarySpecializations.length === 0 ||
-              formData.servicesTreatment.length === 0 ||
-              educationList.length === 0 // <-- validation only for popup
-            ) && (
+            {passwordError && (
               <div className="w-full text-red-600 text-center text-sm font-medium mt-2 mb-2">
-                Please fill all required fields .
+                {passwordError}
               </div>
             )}
           </>

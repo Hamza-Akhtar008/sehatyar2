@@ -140,10 +140,10 @@ const SignupPage = () => {
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full h-[52px] rounded-xl font-semibold text-[16px] text-white mt-4 hover:opacity-90 transition-opacity"
+              className="btn-wipe-up w-full h-[52px] rounded-xl font-semibold text-[16px] text-white mt-4 transition-colors duration-300"
               style={{ backgroundColor: PRIMARY_PURPLE }}
             >
-              Create account
+              <span className="relative z-10">Create account</span>
             </button>
 
             {/* Sign In Link */}

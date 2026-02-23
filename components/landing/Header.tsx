@@ -207,6 +207,12 @@ export default function Header() {
                             {city}
                           </Link>
                         ))}
+                        <Link
+                          href={{ pathname: "/doctor", query: { query: spec.name } }}
+                          className="block px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
+                        >
+                          View All
+                        </Link>
                       </div>
                     )}
                   </div>
@@ -245,6 +251,12 @@ export default function Header() {
                             {hospital}
                           </div>
                         ))}
+                        <Link
+                          href={{ pathname: "/doctor", query: { city: city.name.replace(" Clinics", "") } }}
+                          className="block px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
+                        >
+                          View All
+                        </Link>
                       </div>
                     )}
                   </div>
@@ -322,17 +334,16 @@ export default function Header() {
               <>
                 <Link
                   href="/login"
-                  className="px-6 py-3.5 border-[1.5px] border-black rounded-full text-black hover:bg-gray-50 font-medium text-sm transition-colors"
+                  className="btn-wipe-up px-6 py-3.5 border-[1.5px] border-black rounded-full text-black hover:text-white hover:border-[#ff781e] transition-colors duration-300 font-medium text-sm"
                 >
-                  Login / Sign Up
+                  <span className="relative z-10">Login / Sign Up</span>
                 </Link>
-
                 <Link
                   href="/register"
-                  className="pl-6 pr-2 py-1 bg-[#4E148C] text-white hover:bg-[#ff6600] rounded-full text-sm transition-colors flex items-center gap-3"
+                  className="btn-wipe-up pl-6 pr-2 py-1 bg-[#4E148C] text-white rounded-full text-sm flex items-center gap-3"
                 >
-                  Join as Doctor
-                 <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <span className="relative z-10">Join as Doctor</span>
+                 <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" className="relative z-10 flex-shrink-0">
 <rect width="44" height="44" rx="22" fill="white"/>
 <path d="M18.5919 23.8798L25.4073 20.1197M25.4073 20.1197L21.3475 18.8036M25.4073 20.1197L24.3556 24.256" stroke="#4E148C" strokeLinecap="round" strokeLinejoin="round"/>
 </svg>
@@ -345,10 +356,10 @@ export default function Header() {
           <div className="lg:hidden flex items-center gap-3">
             <Link
               href="/register"
-              className="pl-3 sm:pl-4 pr-1 sm:pr-2 py-1.5 sm:py-2 bg-[#4E148C] text-white hover:bg-[#ff6600] rounded-full text-[11px] sm:text-sm font-medium transition-colors flex items-center gap-1.5 sm:gap-2"
+              className="btn-wipe-up pl-3 sm:pl-4 pr-1 sm:pr-2 py-1.5 sm:py-2 bg-[#4E148C] text-white rounded-full text-[11px] sm:text-sm font-medium flex items-center gap-1.5 sm:gap-2"
             >
-              Join as Doctor
-              <svg width="20" height="20" className="sm:w-[24px] sm:h-[24px]" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <span className="relative z-10">Join as Doctor</span>
+              <svg width="20" height="20" className="sm:w-[24px] sm:h-[24px] relative z-10 flex-shrink-0" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect width="44" height="44" rx="22" fill="white"/>
                 <path d="M18.5919 23.8798L25.4073 20.1197M25.4073 20.1197L21.3475 18.8036M25.4073 20.1197L24.3556 24.256" stroke="#4E148C" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
@@ -415,6 +426,12 @@ export default function Header() {
                               {city}
                             </Link>
                           ))}
+                          <Link
+                            href={{ pathname: "/doctor", query: { query: spec.name } }}
+                            className="block py-1 text-sm text-gray-500"
+                          >
+                            View All
+                          </Link>
                         </div>
                       )}
                     </div>
@@ -460,6 +477,12 @@ export default function Header() {
                               {hospital}
                             </div>
                           ))}
+                          <Link
+                            href={{ pathname: "/doctor", query: { city: city.name.replace(" Clinics", "") } }}
+                            className="block py-1 text-sm text-gray-500"
+                          >
+                            View All
+                          </Link>
                         </div>
                       )}
                     </div>

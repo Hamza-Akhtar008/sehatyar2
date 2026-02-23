@@ -102,15 +102,15 @@ export default function PopularDoctors() {
           <div className="flex justify-center gap-3 mt-8">
             <button
               onClick={scrollLeft}
-              className="w-9 h-9 rounded-full flex items-center justify-center transition-all bg-[#4E148C] text-white hover:bg-[#ff6600]"
+              className="btn-wipe-up w-9 h-9 rounded-full flex items-center justify-center bg-[#4E148C] text-white"
             >
-              <ChevronLeft size={18} />
+              <ChevronLeft size={18} className="relative z-10" />
             </button>
             <button
               onClick={scrollRight}
-              className="w-9 h-9 rounded-full flex items-center justify-center transition-all bg-[#4E148C] text-white hover:bg-[#ff6600]"
+              className="btn-wipe-up w-9 h-9 rounded-full flex items-center justify-center bg-[#4E148C] text-white"
             >
-              <ChevronRight size={18} />
+              <ChevronRight size={18} className="relative z-10" />
             </button>
           </div>
         </div>

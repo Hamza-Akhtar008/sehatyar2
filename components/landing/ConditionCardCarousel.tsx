@@ -99,11 +99,11 @@ export default function ConditionCardCarousel() {
         {/* Header Section */}
     <div className="w-full">
       <div className="flex justify-between items-center mb-4 md:mb-6">
-        <h2 className="text-2xl md:text-4xl font-bold text-[#4e148c]">
+        <h2 className="text-3xl md:text-4xl font-bold text-[#4e148c]">
           Doctor by <span className="text-[#ff6600]">Condition</span>
         </h2>
-        <Button className="bg-[#4E148C] text-white rounded-full hover:bg-[#ff6600] px-5 md:px-10 py-1.5 md:py-3 text-[13px] md:text-base h-auto min-h-[32px] font-medium shadow-md transition-all active:scale-95">
-          View All
+        <Button className="btn-wipe-up bg-[#4E148C] text-white rounded-full px-5 md:px-10 py-1.5 md:py-3 text-[13px] md:text-base h-auto min-h-[32px] font-medium shadow-md active:scale-95">
+          <span className="relative z-10">View All</span>
         </Button>
       </div>
 

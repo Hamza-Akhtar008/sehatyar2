@@ -219,7 +219,7 @@ export default function HeroSection() {
                       onClick={() => setIsInClinicModalOpen(true)}
                       placeholder="Select City"
                       className="bg-transparent border-none outline-none text-gray-700 text-base font-medium cursor-pointer p-0 h-auto focus-visible:outline-none w-full"
-                    />
+                    />InClin
                     {isCityFocused && citySuggestions.length > 0 && (
                       <div className="absolute top-full left-0 mt-2 w-full bg-white border border-gray-100 rounded-xl shadow-xl z-50 overflow-hidden max-h-48 overflow-y-auto">
                         {citySuggestions.map((suggestion, index) => (
@@ -263,7 +263,7 @@ export default function HeroSection() {
                   </div>
                   <Button
                     onClick={handleSearch}
-                    className="bg-[#4E148C] hover:bg-[#ff781e] text-white rounded-[22px] px-6 sm:px-10 py-4 h-auto text-sm font-medium transition-colors"
+                    className="btn-wipe-up bg-[#4E148C] text-white rounded-[22px] px-6 sm:px-10 py-4 h-auto text-sm font-medium"
                   >
                     Search
                   </Button>
@@ -353,7 +353,7 @@ export default function HeroSection() {
 
                 <Button
                   onClick={() => setIsInClinicModalOpen(true)}
-                  className="bg-[#4E148C] hover:bg-[#ff781e] text-white rounded-full px-6 lg:px-9 py-4 h-auto text-base font-medium transition-colors"
+                  className="btn-wipe-up bg-[#4E148C] text-white rounded-full px-6 lg:px-9 py-4 h-auto text-base font-medium"
                 >
                   Search
                 </Button>
@@ -381,9 +381,9 @@ export default function HeroSection() {
                       </p>
                       <button
                         onClick={() => setIsConsultModalOpen(true)}
-                         className="w-8 h-8 lg:w-11 lg:h-11 bg-[#4E148C] rounded-lg flex items-center justify-center flex-shrink-0 hover:bg-[#ff781e] transition-colors aspect-square"
+                        className="btn-wipe-up w-8 h-8 lg:w-11 lg:h-11 bg-[#4E148C] rounded-lg flex items-center justify-center flex-shrink-0 aspect-square"
                       >
-                        <ArrowRight className="w-3 h-3 lg:w-5 lg:h-5 text-white -rotate-45" />
+                        <ArrowRight className="w-3 h-3 lg:w-5 lg:h-5 text-white -rotate-45 relative z-10" />
                       </button>
                     </div>
                     <p className="text-[10px] lg:text-[13px] text-gray-500 leading-relaxed hidden lg:block">
@@ -402,18 +402,15 @@ export default function HeroSection() {
                       className="object-cover"
                     />
                     <div className="absolute bottom-2 lg:bottom-3 left-2 lg:left-3 right-2 lg:right-3">
-                      <button 
-
-                       onClick={() => setIsInClinicModalOpen(true)}
-                        className="w-full bg-[#4E148C] text-white py-2.5 lg:py-3 px-3 lg:px-6 rounded-full flex items-center justify-between text-sm lg:text-base font-normal hover:bg-[#ff781e] transition-colors shadow-lg"
+                      <button
+                        onClick={() => setIsInClinicModalOpen(true)}
+                        className="btn-wipe-up w-full bg-[#4E148C] text-white py-2.5 lg:py-3 px-3 lg:px-6 rounded-full flex items-center justify-between text-sm lg:text-base font-normal shadow-lg"
                       >
-                        <div className="flex items-center gap-1.5 lg:gap-2.5">
-                          <div
-                           
-                            className="w-1.5 h-1.5 lg:w-2 lg:h-2 rounded-full bg-white" />
+                        <div className="flex items-center gap-1.5 lg:gap-2.5 relative z-10">
+                          <div className="w-1.5 h-1.5 lg:w-2 lg:h-2 rounded-full bg-white" />
                           In Clinic Appointment
                         </div>
-                        <ArrowRight className="w-3 h-3 lg:w-4 lg:h-4 -rotate-45" />
+                        <ArrowRight className="w-3 h-3 lg:w-4 lg:h-4 -rotate-45 relative z-10" />
                       </button>
                     </div>
                   </div>
@@ -443,9 +440,9 @@ export default function HeroSection() {
               </p>
               <button
                 onClick={() => setIsConsultModalOpen(true)}
-                className="w-8 h-8 bg-[#4E148C] rounded-full flex items-center justify-center flex-shrink-0 hover:bg-[#ff781e] transition-colors"
+                className="btn-wipe-up w-8 h-8 bg-[#4E148C] rounded-full flex items-center justify-center flex-shrink-0"
               >
-                <ArrowRight className="w-3 h-3 text-white -rotate-45" />
+                <ArrowRight className="w-3 h-3 text-white -rotate-45 relative z-10" />
               </button>
             </div>
           </div>
@@ -460,15 +457,15 @@ export default function HeroSection() {
                 className="object-cover"
               />
               <div className="absolute bottom-3 left-2 right-2">
-                <button 
+                <button
                   onClick={() => setIsInClinicModalOpen(true)}
-                  className="w-full bg-[#4E148C] text-white py-2 sm:py-3.5 px-2 sm:px-4 rounded-full flex items-center justify-between text-[10px] sm:text-sm font-normal hover:bg-[#ff781e] transition-colors shadow-lg"
+                  className="btn-wipe-up w-full bg-[#4E148C] text-white py-2 sm:py-3.5 px-2 sm:px-4 rounded-full flex items-center justify-between text-[10px] sm:text-sm font-normal shadow-lg"
                 >
-                  <div className="flex items-center gap-1 sm:gap-2">
+                  <div className="flex items-center gap-1 sm:gap-2 relative z-10">
                     <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white" />
                     In Clinic Appointment
                   </div>
-                  <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 -rotate-45" />
+                  <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 -rotate-45 relative z-10" />
                 </button>
               </div>
             </div>
