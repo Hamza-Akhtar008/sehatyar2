@@ -11,3 +11,13 @@ export const postAppointment = async (payload: any) => {
     throw error;
   }
 };
+
+export const getUpcomingAppointments = async (doctorId: number | string) => {
+    try {
+        const response = await axios.get(`${BASE_URL}appointments/for/doctors?doctorId=${doctorId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching appointments for logged-in doctor:', error);
+        throw error;
+    }
+};

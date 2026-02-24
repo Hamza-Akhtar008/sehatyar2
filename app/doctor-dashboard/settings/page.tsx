@@ -1,95 +1,272 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
 import { Separator } from "@/components/ui/separator"
+import { toast } from "sonner"
 import {
   User,
   Stethoscope,
   GraduationCap,
-  Briefcase,
   Plus,
   Trash2,
   Save,
+  Pencil,
+  Image as ImageIcon
 } from "lucide-react"
 
-export default function SettingsPage() {
-  const [education, setEducation] = useState([
-    { id: 1, degree: "MBBS", institution: "King Edward Medical University", year: "2010" },
-    { id: 2, degree: "FCPS (Cardiology)", institution: "College of Physicians and Surgeons Pakistan", year: "2015" },
-  ])
+interface Education {
+  institute?: string
+  degreeName?: string
+  fieldOfStudy?: string
+}
 
-  const [experience, setExperience] = useState([
-    {
-      id: 1,
-      designation: "Senior Cardiologist",
-      hospital: "Mayo Hospital",
-      location: "Lahore",
-      startDate: "2015-01-01",
-      endDate: "",
-      isCurrent: true
-    },
-    {
-      id: 2,
-      designation: "Resident Doctor",
-      hospital: "Jinnah Hospital",
-      location: "Lahore",
-      startDate: "2010-01-01",
-      endDate: "2015-01-01",
-      isCurrent: false
-    },
-  ])
+export default function SettingsPage() {
+  const [formData, setFormData] = useState({
+    fullName: "",
+    yearsOfExperience: "",
+    FeesPerConsultation: "",
+    Description: "",
+    primarySpecialization: "",
+    profilePic: "",
+  })
+  
+  const [education, setEducation] = useState<Education[]>([])
+  const [servicesTreatementOffered, setServicesTreatementOffered] = useState<string[]>([])
+  const [conditionTreatments, setConditionTreatments] = useState<string[]>([])
+  
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [editMode, setEditMode] = useState(false)
+  const [userId, setUserId] = useState<string | null>(null)
+  const [doctorId, setDoctorId] = useState<string | null>(null)
+  const [saving, setSaving] = useState(false)
+
+  useEffect(() => {
+    const stored = localStorage.getItem("user_data")
+    if (!stored) return
+    
+    try {
+      const parsed = JSON.parse(stored)
+      const docId = parsed.doctorId
+      const uId = parsed.id
+      setUserId(uId?.toString())
+      setDoctorId(docId?.toString())
+      
+      if (docId) {
+        fetchProfile(docId)
+      }
+    } catch (err) {
+      console.error("Error parsing user data:", err)
+    }
+  }, [])
+
+  const fetchProfile = async (docId: string) => {
+    setLoading(true)
+    setError(null)
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}doctor-profile/${docId}`, { 
+        cache: "no-store" 
+      })
+      if (!res.ok) throw new Error("Failed to load profile")
+      
+      const data = await res.json()
+      
+      setFormData({
+        fullName: data.user?.fullName || "",
+        yearsOfExperience: data.yearsOfExperience || "",
+        FeesPerConsultation: data.FeesPerConsultation || "",
+        Description: data.Description || "",
+        primarySpecialization: Array.isArray(data.primarySpecialization) 
+          ? data.primarySpecialization.join(", ") 
+          : "",
+        profilePic: data.profilePic || "",
+      })
+      
+      setServicesTreatementOffered(data.servicesTreatementOffered || [])
+      setConditionTreatments(data.conditionTreatments || [])
+      setEducation(data.education || [])
+    } catch (e: any) {
+      setError(e.message || "Error loading profile")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }))
+  }
+
+  const handleEducationChange = (index: number, field: keyof Education, value: string) => {
+    setEducation((prev) => {
+      const updated = [...prev]
+      updated[index] = { ...updated[index], [field]: value }
+      return updated
+    })
+  }
 
   const addEducation = () => {
-    setEducation([...education, { id: Date.now(), degree: "", institution: "", year: "" }])
+    setEducation((prev) => [...prev, { institute: "", degreeName: "", fieldOfStudy: "" }])
   }
 
-  const removeEducation = (id: number) => {
-    setEducation(education.filter((item) => item.id !== id))
+  const removeEducation = (index: number) => {
+    setEducation((prev) => prev.filter((_, i) => i !== index))
   }
 
-  const addExperience = () => {
-    setExperience([...experience, {
-      id: Date.now(),
-      designation: "",
-      hospital: "",
-      location: "",
-      startDate: "",
-      endDate: "",
-      isCurrent: false
-    }])
+  const addService = () => {
+    setServicesTreatementOffered((prev) => [...prev, ""])
   }
 
-  const removeExperience = (id: number) => {
-    setExperience(experience.filter((item) => item.id !== id))
+  const removeService = (index: number) => {
+    setServicesTreatementOffered((prev) => prev.filter((_, i) => i !== index))
+  }
+
+  const handleServiceChange = (index: number, value: string) => {
+    setServicesTreatementOffered((prev) => {
+      const updated = [...prev]
+      updated[index] = value
+      return updated
+    })
+  }
+
+  const addCondition = () => {
+    setConditionTreatments((prev) => [...prev, ""])
+  }
+
+  const removeCondition = (index: number) => {
+    setConditionTreatments((prev) => prev.filter((_, i) => i !== index))
+  }
+
+  const handleConditionChange = (index: number, value: string) => {
+    setConditionTreatments((prev) => {
+      const updated = [...prev]
+      updated[index] = value
+      return updated
+    })
+  }
+
+  const handleEdit = () => setEditMode(true)
+  
+  const handleCancelEdit = () => {
+    setEditMode(false)
+    if (doctorId) {
+      fetchProfile(doctorId)
+    }
+  }
+
+  const handleSaveChanges = async () => {
+    if (!userId || !doctorId) return
+    setSaving(true)
+    setError(null)
+    
+    try {
+      // Update user profile (fullName)
+      const userPayload = {
+        fullName: formData.fullName,
+      }
+      
+      const userRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}users/${userId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(userPayload),
+      })
+      
+      if (!userRes.ok) throw new Error("Failed to update user profile")
+      
+      // Update doctor profile
+      const doctorPayload = {
+        yearsOfExperience: formData.yearsOfExperience,
+        FeesPerConsultation: formData.FeesPerConsultation ? Number(formData.FeesPerConsultation) : null,
+        Description: formData.Description || null,
+        profilePic: formData.profilePic || "",
+        primarySpecialization: formData.primarySpecialization
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean),
+        servicesTreatementOffered: servicesTreatementOffered.filter(Boolean),
+        conditionTreatments: conditionTreatments.filter(Boolean),
+        education: education.filter(
+          (e) => e.institute || e.degreeName || e.fieldOfStudy
+        ),
+      }
+      
+      const doctorRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}doctor-profile/${doctorId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(doctorPayload),
+      })
+      
+      if (!doctorRes.ok) throw new Error("Failed to update doctor profile")
+      
+      setEditMode(false)
+      toast.success("Profile updated successfully!")
+    } catch (err: any) {
+      setError(err.message || "Failed to save changes")
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex h-[50vh] flex-col items-center justify-center gap-4">
+        <div className="size-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+        <p className="text-muted-foreground font-medium">Loading profile settings...</p>
+      </div>
+    )
   }
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold">Doctor Profile Settings</h2>
           <p className="text-sm text-muted-foreground">Manage your professional information and public profile</p>
         </div>
-        <Button>
-          <Save className="mr-2 h-4 w-4" />
-          Save Changes
-        </Button>
+        <div className="flex gap-2">
+          {!editMode ? (
+            <Button onClick={handleEdit} className="min-w-[120px]">
+              <Pencil className="mr-2 h-4 w-4" />
+              Edit Profile
+            </Button>
+          ) : (
+            <>
+              <Button onClick={handleCancelEdit} variant="outline">
+                Cancel
+              </Button>
+              <Button onClick={handleSaveChanges} disabled={saving} className="min-w-[140px]">
+                {saving ? (
+                  <div className="size-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent mr-2" />
+                ) : (
+                  <Save className="mr-2 h-4 w-4" />
+                )}
+                {saving ? "Saving..." : "Save Changes"}
+              </Button>
+            </>
+          )}
+        </div>
       </div>
 
+      {error && (
+        <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive font-medium border border-destructive/20">
+          {error}
+        </div>
+      )}
+
       <Tabs defaultValue="basic" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
-          <TabsTrigger value="basic">Basic Information</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-3 md:w-auto md:inline-grid">
+          <TabsTrigger value="basic">Basic Info</TabsTrigger>
           <TabsTrigger value="specialization">Specialization</TabsTrigger>
           <TabsTrigger value="education">Education</TabsTrigger>
-          <TabsTrigger value="experience">Experience</TabsTrigger>
         </TabsList>
 
         {/* Basic Information Tab */}
@@ -103,65 +280,105 @@ export default function SettingsPage() {
               <CardDescription>Update your personal and professional identity</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="full-name">Full Name</Label>
-                  <Input id="full-name" defaultValue="Dr. Misbah Batool" />
+              
+              <div className="flex flex-col sm:flex-row gap-6 items-start">
+               <div className="relative group shrink-0">
+                  <div className="w-28 h-28 rounded-xl bg-muted overflow-hidden flex items-center justify-center border-2 border-border transition-all duration-300 relative">
+                    {formData.profilePic ? (
+                      <img
+                        src={formData.profilePic}
+                        alt="Profile"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="text-muted-foreground flex flex-col items-center">
+                        <ImageIcon className="w-8 h-8 opacity-50 mb-1" />
+                        <span className="text-[10px] font-medium uppercase tracking-wider opacity-60">No Image</span>
+                      </div>
+                    )}
+                    
+                    {editMode && (
+                        <div 
+                          className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer"
+                          onClick={() => {
+                            const input = document.createElement("input")
+                            input.type = "file"
+                            input.accept = "image/*"
+                            input.onchange = (e: any) => {
+                              const file = e.target.files?.[0]
+                              if (file) {
+                                const reader = new FileReader()
+                                reader.onloadend = () => {
+                                  setFormData((prev) => ({ ...prev, profilePic: reader.result as string }))
+                                }
+                                reader.readAsDataURL(file)
+                              }
+                            }
+                            input.click()
+                          }}
+                        >
+                          <span className="text-white text-xs font-medium">Change Photo</span>
+                        </div>
+                    )}
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="prefix">Professional Prefix</Label>
-                  <Select defaultValue="dr">
-                    <SelectTrigger id="prefix">
-                      <SelectValue placeholder="Select title" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="dr">Dr.</SelectItem>
-                      <SelectItem value="prof">Prof.</SelectItem>
-                      <SelectItem value="mr">Mr.</SelectItem>
-                      <SelectItem value="ms">Ms.</SelectItem>
-                    </SelectContent>
-                  </Select>
+
+                <div className="flex-1 w-full space-y-4">
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="fullName">Full Name</Label>
+                      <Input 
+                        id="fullName" 
+                        name="fullName"
+                        value={formData.fullName} 
+                        onChange={handleInputChange}
+                        disabled={!editMode}
+                        placeholder="e.g. Dr. John Doe"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="yearsOfExperience">Years of Experience</Label>
+                      <Input 
+                        id="yearsOfExperience" 
+                        name="yearsOfExperience"
+                        type="number" 
+                        value={formData.yearsOfExperience} 
+                        onChange={handleInputChange}
+                        disabled={!editMode}
+                        placeholder="e.g. 10"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="FeesPerConsultation">Fees Per Consultation ($)</Label>
+                      <Input 
+                        id="FeesPerConsultation" 
+                        name="FeesPerConsultation"
+                        type="number" 
+                        value={formData.FeesPerConsultation} 
+                        onChange={handleInputChange}
+                        disabled={!editMode}
+                        placeholder="e.g. 150"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
 
+              <Separator />
+
               <div className="space-y-2">
-                <Label htmlFor="bio">About Me / Biography</Label>
+                <Label htmlFor="Description">About Me / Biography</Label>
                 <Textarea
-                  id="bio"
+                  id="Description"
+                  name="Description"
                   className="min-h-[120px]"
-                  defaultValue="Dr. Misbah Batool is a highly experienced Senior Cardiologist with over 18 years of clinical expertise. She specializes in interventional cardiology and has performed numerous successful procedures."
+                  value={formData.Description}
+                  onChange={handleInputChange}
+                  disabled={!editMode}
+                  placeholder="Describe your medical expertise, approach to patient care, and any notable achievements..."
                 />
               </div>
 
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="focus">Clinical Focus</Label>
-                  <Input id="focus" placeholder="e.g. Heart Rhythm Disorders" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="experience-years">Years of Experience</Label>
-                  <Input id="experience-years" type="number" defaultValue="18" />
-                </div>
-              </div>
-
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="verification-id">Verification ID (PMC/NMC)</Label>
-                  <Input id="verification-id" defaultValue="12345-P-LAH" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="verification-body">Verification Body</Label>
-                  <Input id="verification-body" defaultValue="Pakistan Medical Commission" />
-                </div>
-              </div>
-
-              <div className="flex justify-end gap-2">
-                <Button variant="outline">Cancel</Button>
-                <Button>
-                  <Save className="mr-2 h-4 w-4" />
-                  Save Basic Info
-                </Button>
-              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -176,57 +393,99 @@ export default function SettingsPage() {
               </CardTitle>
               <CardDescription>Define your specialties and healthcare services</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="primary-specialty">Primary Specialty</Label>
-                  <Input id="primary-specialty" defaultValue="Cardiology" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="secondary-specialty">Secondary Specialty</Label>
-                  <Input id="secondary-specialty" defaultValue="Interventional Cardiology" />
-                </div>
-              </div>
-
+            <CardContent className="space-y-8">
               <div className="space-y-2">
-                <Label htmlFor="services">Services Provided</Label>
-                <Textarea
-                  id="services"
-                  placeholder="e.g. Echocardiography, Stress Testing"
-                  defaultValue="Echocardiography, Heart Transplant, Valve Surgery, Stress Testing"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="conditions">Conditions Treated</Label>
-                <Textarea
-                  id="conditions"
-                  placeholder="e.g. Heart Failure, Arrythmia"
-                  defaultValue="Heart Failure, PCOS, Arrythmia, High Blood Pressure"
+                <Label htmlFor="primarySpecialization">Primary Specializations <span className="text-muted-foreground font-normal">(Comma separated)</span></Label>
+                <Input 
+                  id="primarySpecialization" 
+                  name="primarySpecialization"
+                  value={formData.primarySpecialization} 
+                  onChange={handleInputChange}
+                  disabled={!editMode}
+                  placeholder="e.g. Cardiology, Internal Medicine"
                 />
               </div>
 
               <Separator />
 
-              <div className="space-y-2">
-                <Label>Languages Spoken</Label>
-                <div className="flex flex-wrap gap-2 pt-1">
-                  {["English", "Urdu", "Punjabi"].map((lang) => (
-                    <div key={lang} className="bg-secondary/50 px-3 py-1 rounded-md text-xs font-medium flex items-center gap-2 border border-border">
-                      {lang}
-                      <button className="text-muted-foreground hover:text-foreground">×</button>
-                    </div>
-                  ))}
-                  <Button variant="outline" size="sm" className="h-7 text-xs">
-                    <Plus className="h-3 w-3 mr-1" /> Add Language
-                  </Button>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <Label>Services Offered</Label>
+                  {editMode && (
+                    <Button type="button" onClick={addService} size="sm" variant="outline" className="h-8">
+                      <Plus className="mr-2 h-4 w-4" /> Add Service
+                    </Button>
+                  )}
                 </div>
+                
+                {servicesTreatementOffered.length === 0 ? (
+                  <div className="text-sm text-muted-foreground italic bg-muted/30 p-4 rounded-md border border-dashed">No services specifically added.</div>
+                ) : (
+                  <div className="grid gap-3">
+                    {servicesTreatementOffered.map((service, index) => (
+                      <div key={index} className="flex items-center gap-2">
+                        <Input
+                          placeholder="e.g., Echocardiography"
+                          value={service}
+                          onChange={(e) => handleServiceChange(index, e.target.value)}
+                          disabled={!editMode}
+                        />
+                        {editMode && (
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={() => removeService(index)}
+                            className="text-destructive shrink-0 hover:bg-destructive/10"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
-              <div className="flex justify-end gap-2">
-                <Button variant="outline">Cancel</Button>
-                <Button>Save Specialization</Button>
+              <Separator />
+
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <Label>Conditions Treated</Label>
+                  {editMode && (
+                    <Button type="button" onClick={addCondition} size="sm" variant="outline" className="h-8">
+                      <Plus className="mr-2 h-4 w-4" /> Add Condition
+                    </Button>
+                  )}
+                </div>
+                
+                {conditionTreatments.length === 0 ? (
+                  <div className="text-sm text-muted-foreground italic bg-muted/30 p-4 rounded-md border border-dashed">No conditions specifically added.</div>
+                ) : (
+                  <div className="grid gap-3">
+                    {conditionTreatments.map((condition, index) => (
+                      <div key={index} className="flex items-center gap-2">
+                        <Input
+                          placeholder="e.g., Hypertension"
+                          value={condition}
+                          onChange={(e) => handleConditionChange(index, e.target.value)}
+                          disabled={!editMode}
+                        />
+                        {editMode && (
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={() => removeCondition(index)}
+                            className="text-destructive shrink-0 hover:bg-destructive/10"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
+
             </CardContent>
           </Card>
         </TabsContent>
@@ -234,7 +493,7 @@ export default function SettingsPage() {
         {/* Education Tab */}
         <TabsContent value="education" className="space-y-4">
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-6">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-6 border-b mb-6">
               <div className="space-y-1">
                 <CardTitle className="flex items-center text-xl font-bold">
                   <GraduationCap className="mr-2 h-5 w-5" />
@@ -242,144 +501,66 @@ export default function SettingsPage() {
                 </CardTitle>
                 <CardDescription>Manage your academic qualifications</CardDescription>
               </div>
-              <Button onClick={addEducation} size="sm" variant="outline" className="font-medium">
-                <Plus className="mr-2 h-4 w-4" /> Add Degree
-              </Button>
+              {editMode && (
+                <Button onClick={addEducation} size="sm" variant="outline" className="font-medium">
+                  <Plus className="mr-2 h-4 w-4" /> Add Degree
+                </Button>
+              )}
             </CardHeader>
-            <CardContent className="space-y-8 pt-0">
-              {education.map((item, index) => (
-                <div key={item.id} className="space-y-6">
-                  {index > 0 && <Separator className="mb-8" />}
-                  <div className="relative group">
-                    <div className="flex items-center justify-end mb-4">
+            <CardContent className="space-y-8">
+              {education.length === 0 ? (
+                 <div className="text-center py-6 text-muted-foreground border-2 border-dashed rounded-lg bg-muted/10">
+                   No education records added yet.
+                 </div>
+              ) : education.map((item, index) => (
+                <div key={index} className="space-y-4 relative group p-4 border rounded-lg bg-card">
+                  {editMode && (
+                    <div className="absolute right-2 top-2">
                       <Button
                         variant="ghost"
                         size="sm"
                         className="text-destructive hover:bg-destructive/10 h-8 font-medium"
-                        onClick={() => removeEducation(item.id)}
+                        onClick={() => removeEducation(index)}
                       >
-                        <Trash2 className="h-4 w-4 mr-2" /> Remove
+                        <Trash2 className="h-4 w-4 mr-1" /> Remove
                       </Button>
                     </div>
-                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                      <div className="space-y-2">
-                        <Label>Degree / Certification</Label>
-                        <Input defaultValue={item.degree} placeholder="e.g. MBBS" />
-                      </div>
-                      <div className="space-y-2">
-                        <Label>Institution</Label>
-                        <Input defaultValue={item.institution} placeholder="e.g. Medical College" />
-                      </div>
-                      <div className="space-y-2">
-                        <Label>Graduation Year</Label>
-                        <Input defaultValue={item.year} placeholder="e.g. 2010" />
-                      </div>
+                  )}
+                  <div className="grid gap-4 md:grid-cols-3 mt-4">
+                    <div className="space-y-2">
+                      <Label>Degree / Certification</Label>
+                      <Input 
+                        value={item.degreeName || ""} 
+                        onChange={(e) => handleEducationChange(index, "degreeName", e.target.value)}
+                        disabled={!editMode} 
+                        placeholder="e.g. MBBS" 
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Field of Study</Label>
+                      <Input 
+                        value={item.fieldOfStudy || ""} 
+                        onChange={(e) => handleEducationChange(index, "fieldOfStudy", e.target.value)}
+                        disabled={!editMode} 
+                        placeholder="e.g. Medicine" 
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Institution</Label>
+                      <Input 
+                        value={item.institute || ""} 
+                        onChange={(e) => handleEducationChange(index, "institute", e.target.value)}
+                        disabled={!editMode} 
+                        placeholder="e.g. Harvard Univ." 
+                      />
                     </div>
                   </div>
                 </div>
               ))}
-
-              <Separator />
-              <div className="flex justify-end gap-2">
-                <Button variant="outline">Cancel</Button>
-                <Button>
-                  <Save className="mr-2 h-4 w-4" />
-                  Save Education
-                </Button>
-              </div>
             </CardContent>
           </Card>
         </TabsContent>
 
-        {/* Experience Tab */}
-        <TabsContent value="experience" className="space-y-4">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-6">
-              <div className="space-y-1">
-                <CardTitle className="flex items-center text-xl font-bold">
-                  <Briefcase className="mr-2 h-5 w-5" />
-                  Professional Experience
-                </CardTitle>
-                <CardDescription>Your clinical and professional work history</CardDescription>
-              </div>
-              <Button onClick={addExperience} size="sm" variant="outline" className="font-medium">
-                <Plus className="mr-2 h-4 w-4" /> Add Experience
-              </Button>
-            </CardHeader>
-            <CardContent className="space-y-8 pt-0">
-              {experience.map((item, index) => (
-                <div key={item.id} className="space-y-6">
-                  {index > 0 && <Separator className="mb-8" />}
-                  <div className="relative group">
-                    <div className="flex items-center justify-end mb-4">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-destructive hover:bg-destructive/10 h-8 font-medium"
-                        onClick={() => removeExperience(item.id)}
-                      >
-                        <Trash2 className="h-4 w-4 mr-2" /> Remove
-                      </Button>
-                    </div>
-                    <div className="grid gap-6 md:grid-cols-2">
-                      <div className="space-y-2">
-                        <Label>Designation</Label>
-                        <Input defaultValue={item.designation} placeholder="e.g. Senior Surgeon" />
-                      </div>
-                      <div className="space-y-2">
-                        <Label>Hospital / Clinic</Label>
-                        <Input defaultValue={item.hospital} placeholder="e.g. City General Hospital" />
-                      </div>
-                      <div className="space-y-2">
-                        <Label>Location</Label>
-                        <Input defaultValue={item.location} placeholder="e.g. Lahore, Pakistan" />
-                      </div>
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2 h-[38px]">
-                          <Switch
-                            id={`current-${item.id}`}
-                            checked={item.isCurrent}
-                            onCheckedChange={(checked) => {
-                              const newExp = experience.map(exp =>
-                                exp.id === item.id ? { ...exp, isCurrent: checked } : exp
-                              );
-                              setExperience(newExp);
-                            }}
-                          />
-                          <Label htmlFor={`current-${item.id}`} className="font-medium">I currently work here</Label>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="grid gap-6 md:grid-cols-2 mt-6">
-                      <div className="space-y-2">
-                        <Label>Start Date</Label>
-                        <Input type="date" defaultValue={item.startDate} />
-                      </div>
-                      <div className="space-y-2">
-                        <Label>End Date</Label>
-                        <Input
-                          type="date"
-                          defaultValue={item.endDate}
-                          disabled={item.isCurrent}
-                          className={item.isCurrent ? "opacity-50" : ""}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-
-              <Separator />
-              <div className="flex justify-end gap-2">
-                <Button variant="outline">Cancel</Button>
-                <Button>
-                  <Save className="mr-2 h-4 w-4" />
-                  Save Experience
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
       </Tabs>
     </div>
   )

@@ -78,3 +78,16 @@ export const deleteAvailability = async (id: number) => {
         throw error;
     }
 };
+
+export async function ChangeDayAvailability(dayOfWeek: string, isActive: boolean) {
+    try {
+        const response = await axiosInstance.patch('/availability/toggle/day', {
+            dayOfWeek,
+            isActive,
+        });
+        return response.data;
+    } catch (error: any) {
+        throw error;
+    }
+}
+

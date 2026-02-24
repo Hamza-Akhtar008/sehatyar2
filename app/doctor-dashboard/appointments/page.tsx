@@ -41,6 +41,10 @@ interface ApiAppointment {
   clinicId: number | null;
   isClinicAppointment: boolean;
   appointmentType: string | null;
+  patient?: any;
+  profilepicture?: string;
+  doctor?: any;
+  name?: string;
 }
 
 // UI Appointment type (used for display)
@@ -90,24 +94,24 @@ const transformAppointment = (apiData: ApiAppointment): Appointment => {
   };
 
   return {
-    id: apiData.id.toString(),
+    id: apiData.id?.toString(),
     patient: {
-      name: apiData.patientName,
-      image: "/user-3.png", // Default image
-      email: apiData.email,
-      phone: apiData.phoneNumber,
+      name: apiData.patientName || apiData.name || apiData.patient?.name || "Unknown Patient",
+      image: apiData.profilepicture || apiData.patient?.profilePic || "",
+      email: apiData.email || apiData.patient?.email || "",
+      phone: apiData.phoneNumber || apiData.patient?.phoneNumber || "",
     },
     doctor: "Doctor", // Will be the logged-in doctor
-    date: new Date(apiData.appointmentDate).toISOString().split("T")[0],
-    time: apiData.appointmentTime,
+    date: apiData.appointmentDate ? new Date(apiData.appointmentDate).toISOString().split("T")[0] : "",
+    time: apiData.appointmentTime || "",
     status: formatStatus(apiData.status),
     type: formatType(apiData.appointmentType),
     duration: "30 min", // Default duration
-    department: "General", // Default department
+    department: apiData.appointmentFor || "General", // Default department
     notes: apiData.notes || "",
-    paymentMethod: apiData.paymentMethod,
+    paymentMethod: apiData.paymentMethod || "",
     amount: apiData.amount,
-    prescriptionFile: apiData.prescriptionFile,
+    prescriptionFile: apiData.prescriptionFile || null,
     medicalHistoryFiles: apiData.medicalHistoryFiles || [],
   };
 };
@@ -153,7 +157,8 @@ export default function AppointmentsPage() {
         setIsLoading(true);
         setError(null);
         const response = await getAppointmentsForDoctor();
-        const transformedData = response.map((apt: ApiAppointment) => transformAppointment(apt));
+        const arr = Array.isArray(response) ? response : (Array.isArray(response?.upcomingAppointments) ? response.upcomingAppointments : (Array.isArray(response?.appointments) ? response.appointments : []));
+        const transformedData = arr.map((apt: ApiAppointment) => transformAppointment(apt));
         setAppointments(transformedData);
         setFilteredAppointments(transformedData);
       } catch (err) {
@@ -484,7 +489,7 @@ export default function AppointmentsPage() {
                           <TableCell>
                             <div className="flex items-center gap-3">
                               <Avatar>
-                                <AvatarImage src={appointment.patient.image || "/user-2.png"} alt={appointment.patient.name} />
+                                <AvatarImage src={appointment.patient.image || ""} alt={appointment.patient.name} />
                                 <AvatarFallback>{appointment.patient.name.charAt(0)}</AvatarFallback>
                               </Avatar>
                               <div>

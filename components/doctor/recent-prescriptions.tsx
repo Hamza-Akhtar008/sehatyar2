@@ -3,42 +3,28 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { CalendarDays, FileText, RefreshCw } from "lucide-react"
 
-export function RecentPrescriptions() {
-  const prescriptions = [
-    {
-      id: 1,
+export function RecentPrescriptions({ appointments = [] }: { appointments?: any[] }) {
+  const prescriptions = appointments.slice(0, 5).map((a, i) => {
+    const name = a.patientName || a.name || a.patient?.name || "Unknown Patient";
+    const avatar = a.profilepicture || a.doctor?.profilePic || a.patient?.profilePic || "/user-2.png";
+    const initials = name.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase() || "P";
+    
+    return {
+      id: a.id || a._id || i,
       patient: {
-        name: "Emma Thompson",
-        avatar: "/abstract-geometric-lt.png",
-        initials: "ET",
+        name,
+        avatar,
+        initials,
       },
-      date: "Today, 09:45 AM",
-      medications: ["Sumatriptan 50mg, 1 tablet as needed for migraine"],
+      date: a.appointmentTime || a.time || a.startTime || "Today",
+      medications: a.prescription ? [a.prescription] : [`Review medication for ${a.specialty || a.appointmentFor || "consultation"}`],
       status: "Active",
-    },
-    {
-      id: 2,
-      patient: {
-        name: "Michael Chen",
-        avatar: "/abstract-jr.png",
-        initials: "MC",
-      },
-      date: "Today, 11:20 AM",
-      medications: ["Lisinopril 10mg, 1 tablet daily", "Hydrochlorothiazide 12.5mg, 1 tablet daily"],
-      status: "Active",
-    },
-    {
-      id: 3,
-      patient: {
-        name: "Sophia Rodriguez",
-        avatar: "/thoughtful-artist.png",
-        initials: "SR",
-      },
-      date: "Yesterday, 10:30 AM",
-      medications: ["Prenatal vitamins, 1 tablet daily", "Folic acid 400mcg, 1 tablet daily"],
-      status: "Active",
-    },
-  ]
+    };
+  });
+
+  if (prescriptions.length === 0) {
+     return <div className="p-8 text-center text-slate-500 text-sm">No recent prescriptions available.</div>;
+  }
 
   return (
     <div className="space-y-4">

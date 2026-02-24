@@ -5,44 +5,22 @@ import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useState } from "react"
 
-export function DoctorTasks() {
-  const [tasks, setTasks] = useState([
-    {
-      id: 1,
-      title: "Review lab results for Emma Thompson",
-      priority: "High",
-      due: "Today, 2:00 PM",
-      completed: false,
-    },
-    {
-      id: 2,
-      title: "Complete medical certificate for James Wilson",
-      priority: "Medium",
-      due: "Today, 4:00 PM",
-      completed: false,
-    },
-    {
-      id: 3,
-      title: "Follow up on Michael Chen's medication",
-      priority: "High",
-      due: "Today, 5:00 PM",
-      completed: false,
-    },
-    {
-      id: 4,
-      title: "Review treatment plan for Sophia Rodriguez",
-      priority: "Medium",
-      due: "Tomorrow, 10:00 AM",
-      completed: false,
-    },
-    {
-      id: 5,
-      title: "Sign off on nurse practitioner notes",
-      priority: "Low",
-      due: "Tomorrow, 3:00 PM",
-      completed: true,
-    },
-  ])
+export function DoctorTasks({ appointments = [] }: { appointments?: any[] }) {
+  const defaultTasks = appointments.slice(0, 6).map((a, i) => {
+    return {
+      id: a.id || a._id || i,
+      title: `Consultation with ${a.patientName || a.name || a.patient?.name || "Patient"} for ${a.specialty || a.appointmentFor || "check-up"}`,
+      priority: i % 3 === 0 ? "High" : i % 2 === 0 ? "Medium" : "Low",
+      due: a.appointmentTime || a.time || a.startTime || "Today",
+      completed: a.status === "completed" || a.status === "Completed",
+    };
+  });
+
+  const [tasks, setTasks] = useState(defaultTasks);
+
+  if (tasks.length === 0) {
+    return <div className="p-8 text-center text-slate-500 text-sm">No tasks assigned for today.</div>;
+  }
 
   const handleTaskComplete = (taskId: number) => {
     setTasks(tasks.map(task => 

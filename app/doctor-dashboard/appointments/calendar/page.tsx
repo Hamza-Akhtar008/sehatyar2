@@ -34,6 +34,10 @@ interface ApiAppointment {
   clinicId: number | null;
   isClinicAppointment: boolean;
   appointmentType: string | null;
+  patient?: any;
+  profilepicture?: string;
+  doctor?: any;
+  name?: string;
 }
 
 // Calendar Appointment type
@@ -116,19 +120,19 @@ const transformAppointment = (apiData: ApiAppointment): CalendarAppointment => {
   appointmentDate.setHours(0, 0, 0, 0);
 
   return {
-    id: apiData.id.toString(),
+    id: apiData.id?.toString(),
     patient: {
-      name: apiData.patientName,
-      image: "/user-3.png",
+      name: apiData.patientName || apiData.name || apiData.patient?.name || "Unknown Patient",
+      image: apiData.profilepicture || apiData.patient?.profilePic || "",
     },
     doctor: "Doctor",
     date: appointmentDate,
-    time: apiData.appointmentTime,
-    endTime: calculateEndTime(apiData.appointmentTime, 30),
+    time: apiData.appointmentTime || "",
+    endTime: apiData.appointmentTime ? calculateEndTime(apiData.appointmentTime, 30) : "",
     status: status,
     type: formatType(apiData.appointmentType),
     duration: 30,
-    department: "General",
+    department: apiData.appointmentFor || "General",
     color: getColorByStatus(status),
   };
 };
@@ -187,7 +191,8 @@ export default function CalendarPage() {
         setIsLoading(true);
         setError(null);
         const response = await getAppointmentsForDoctor();
-        const transformedData = response.map((apt: ApiAppointment) => transformAppointment(apt));
+        const arr = Array.isArray(response) ? response : (Array.isArray(response?.upcomingAppointments) ? response.upcomingAppointments : (Array.isArray(response?.appointments) ? response.appointments : []));
+        const transformedData = arr.map((apt: ApiAppointment) => transformAppointment(apt));
         setAppointments(transformedData);
       } catch (err) {
         console.error("Failed to fetch appointments:", err);
@@ -316,7 +321,7 @@ export default function CalendarPage() {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center">
                           <Avatar className="h-6 w-6 mr-2">
-                            <AvatarImage src={appointment.patient.image || "/user-2.png"} alt={appointment.patient.name} />
+                            <AvatarImage src={appointment.patient.image || ""} alt={appointment.patient.name} />
                             <AvatarFallback>{appointment.patient.name.charAt(0)}</AvatarFallback>
                           </Avatar>
                           <span className="font-medium text-sm">{appointment.patient.name}</span>

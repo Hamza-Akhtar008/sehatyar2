@@ -64,12 +64,18 @@ const LoginPage = () => {
              user = {
                  id: response.id,
                  email: response.email,
-                 role: response.role
+                 role: response.role,
+                 doctorId: response.doctorId
              };
+         } else if (user && response.doctorId) {
+             user.doctorId = response.doctorId;
          }
          
          if (user) {
              setAuth(response.access_token, user);
+             if (response.doctorId) {
+                 localStorage.setItem("doctorId", response.doctorId.toString());
+             }
              toast.success("Login successful!");
          }
       }

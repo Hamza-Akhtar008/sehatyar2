@@ -7,9 +7,11 @@ import { useRouter, usePathname } from "next/navigation";
 interface User {
   id: number;
   email: string;
+  name?: string;
   fullName?: string;
   role: UserRole;
   access_token?: string;
+  doctorId?: string | number;
 }
 
 interface AuthContextType {

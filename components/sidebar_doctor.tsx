@@ -72,10 +72,10 @@ export function Doctor_Sidebar({ isOpen, setIsOpen }: SidebarProps) {
       title: "Availability",
       href: "/doctor-dashboard/settings/hours",
       icon: Timer,
-      submenu: [
-        { title: "In-Clinic", href: "/doctor-dashboard/settings/hours" },
-        { title: "Online Consultation", href: "/doctor-dashboard/settings/online-hours" },
-      ],
+      // submenu: [
+      //   { title: "In-Clinic", href: "/doctor-dashboard/settings/hours" },
+      //   { title: "Online Consultation", href: "/doctor-dashboard/settings/online-hours" },
+      // ],
     });
     // Patients - for all doctor roles
     items.push({
@@ -90,29 +90,30 @@ export function Doctor_Sidebar({ isOpen, setIsOpen }: SidebarProps) {
       href: "/doctor-dashboard/reviews",
       icon: Star,
       submenu: [
-        { title: "Doctor Reviews", href: "/doctor-dashboard/reviews/doctors" },
+        // { title: "Doctor Reviews", href: "/doctor-dashboard/reviews/doctors" },
         { title: "Patient Reviews", href: "/doctor-dashboard/reviews/patients" },
       ],
     });
 
     // Reports - for all doctor roles
+    // items.push({
+    //   title: "Reports",
+    //   href: "/doctor-dashboard/reports",
+    //   icon: BarChart3,
+    //   submenu: [
+    //     { title: "Overview", href: "/doctor-dashboard/reports" },
+    //     { title: "Appointment Reports", href: "/doctor-dashboard/reports/appointments" },
+    //     { title: "Financial Reports", href: "/doctor-dashboard/reports/financial" },
+    //     { title: "Patient Visit Reports", href: "/doctor-dashboard/reports/patients" },
+    //   ],
+    // });
+
+    // Analytics - for all doctor roles
     items.push({
-      title: "Reports",
-      href: "/doctor-dashboard/reports",
+      title: "Analytics",
+      href: "/doctor-dashboard/analytics",
       icon: BarChart3,
-      submenu: [
-        { title: "Overview", href: "/doctor-dashboard/reports" },
-        { title: "Appointment Reports", href: "/doctor-dashboard/reports/appointments" },
-        { title: "Financial Reports", href: "/doctor-dashboard/reports/financial" },
-        { title: "Patient Visit Reports", href: "/doctor-dashboard/reports/patients" },
-      ],
     });
-
-    // Settings - for all doctor roles
-  
-
-
-
 
     // Chat - for all doctor roles
     items.push({
@@ -122,11 +123,11 @@ export function Doctor_Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     });
 
     // Tasks - for all doctor roles
-    items.push({
-      title: "Tasks",
-      href: "/doctor-dashboard/tasks",
-      icon: ClipboardList,
-    });
+    // items.push({
+    //   title: "Tasks",
+    //   href: "/doctor-dashboard/tasks",
+    //   icon: ClipboardList,
+    // });
       items.push({
       title: "Settings",
       href: "/doctor-dashboard/settings",

@@ -7,6 +7,7 @@ import { Fetchpatients } from "@/lib/Api/Patient/patient_api";
 import axios from "axios";
 import { Search, Plus, Send, Paperclip, MoreVertical, Phone, Video, ArrowLeft, Check, CheckCheck, Image as ImageIcon } from "lucide-react";
 import { UploadFile } from "@/lib/Api/Message/Message_Api";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export interface Patient {
   id: number;
@@ -376,15 +377,12 @@ export default function Messages() {
               }`}
             >
               <div className="relative">
-                <div className="w-12 h-12 rounded-full overflow-hidden bg-background/30 backdrop-blur-sm ring-2 ring-border/50 shadow-sm">
-                    <Image
-                    src="/placeholder-user.jpg"
-                    alt={patient.fullName}
-                    width={48}
-                    height={48}
-                    className="object-cover"
-                    />
-                </div>
+                <Avatar className="w-12 h-12 ring-2 ring-border/50 shadow-sm shrink-0">
+                    <AvatarImage src={(patient as any).profilePic || (patient as any).patientProfile?.profilePic || (patient as any).profilepicture || (patient as any).profilePicture || ""} alt={patient.fullName} className="object-cover" />
+                    <AvatarFallback className="bg-primary/20 text-primary font-semibold uppercase">
+                        {patient.fullName ? patient.fullName.substring(0, 2) : "U"}
+                    </AvatarFallback>
+                </Avatar>
                 {patient.isOnline && (
                     <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 border-2 border-white rounded-full shadow-lg shadow-green-500/50 animate-pulse"></div>
                 )}
@@ -454,15 +452,12 @@ export default function Messages() {
                         <ArrowLeft size={20} />
                     </button>
                     <div className="relative">
-                        <div className="w-10 h-10 rounded-full overflow-hidden bg-background/40 backdrop-blur-sm ring-2 ring-border/50 shadow-sm">
-                            <Image
-                                src={"/placeholder-user.jpg"}
-                                alt={activePatient.fullName}
-                                width={40}
-                                height={40}
-                                className="object-cover"
-                            />
-                        </div>
+                        <Avatar className="w-10 h-10 ring-2 ring-border/50 shadow-sm shrink-0">
+                            <AvatarImage src={(activePatient as any).profilePic || (activePatient as any).patientProfile?.profilePic || (activePatient as any).profilepicture || (activePatient as any).profilePicture || ""} alt={activePatient.fullName} className="object-cover" />
+                            <AvatarFallback className="bg-primary/20 text-primary font-semibold uppercase">
+                                {activePatient.fullName ? activePatient.fullName.substring(0, 2) : "U"}
+                            </AvatarFallback>
+                        </Avatar>
                         {activePatient.isOnline && (
                             <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-background rounded-full shadow-lg shadow-green-500/50 animate-pulse"></div>
                         )}

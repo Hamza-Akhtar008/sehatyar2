@@ -4,59 +4,27 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 
-export function DoctorPatients() {
-  const patients = [
-    {
-      id: 1,
-      name: "Emma Thompson",
-      avatar: "/abstract-geometric-lt.png",
-      initials: "ET",
-      age: 42,
-      gender: "Female",
-      reason: "Annual check-up",
-      status: "New Patient",
-    },
-    {
-      id: 2,
-      name: "Michael Chen",
-      avatar: "/abstract-jr.png",
-      initials: "MC",
-      age: 35,
-      gender: "Male",
-      reason: "Headache, fever",
-      status: "Follow-up",
-    },
-    {
-      id: 3,
-      name: "Sophia Rodriguez",
-      avatar: "/thoughtful-artist.png",
-      initials: "SR",
-      age: 28,
-      gender: "Female",
-      reason: "Pregnancy consultation",
-      status: "Regular",
-    },
-    {
-      id: 4,
-      name: "James Wilson",
-      avatar: "/graffiti-ew.png",
-      initials: "JW",
-      age: 67,
-      gender: "Male",
-      reason: "Chest pain",
-      status: "Urgent",
-    },
-    {
-      id: 5,
-      name: "Olivia Parker",
-      avatar: "/contemplative-artist.png",
-      initials: "OP",
-      age: 8,
-      gender: "Female",
-      reason: "Vaccination",
-      status: "Regular",
-    },
-  ]
+export function DoctorPatients({ appointments = [] }: { appointments?: any[] }) {
+  const patients = appointments.map((a, i) => {
+    const name = a.patientName || a.name || a.patient?.name || "Unknown Patient";
+    const avatar = a.profilepicture || a.doctor?.profilePic || a.patient?.profilePic || "/user-2.png";
+    const initials = name.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase() || "P";
+    
+    return {
+      id: a.id || a._id || i,
+      name,
+      avatar,
+      initials,
+      age: a.patient?.age || a.age || "--",
+      gender: a.patient?.gender || a.gender || "Unknown",
+      reason: a.specialty || a.appointmentFor || "Consultation",
+      status: a.status || (i % 3 === 0 ? "Urgent" : i % 2 === 0 ? "New Patient" : "Regular"), // Fallback variations
+    };
+  });
+
+  if (patients.length === 0) {
+    return <div className="p-8 text-center text-slate-500 text-sm">No patients scheduled for today.</div>;
+  }
 
   return (
     <div className="space-y-4">

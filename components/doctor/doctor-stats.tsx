@@ -4,24 +4,29 @@ import { Bar, BarChart, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YA
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
-export function DoctorStats() {
-  // Sample data for patient visits
-  const patientVisitsData = [
-    { month: "Jan", visits: 45 },
-    { month: "Feb", visits: 52 },
-    { month: "Mar", visits: 48 },
-    { month: "Apr", visits: 61 },
-    { month: "May", visits: 55 },
-    { month: "Jun", visits: 67 },
-    { month: "Jul", visits: 70 },
-    { month: "Aug", visits: 63 },
-    { month: "Sep", visits: 59 },
-    { month: "Oct", visits: 68 },
-    { month: "Nov", visits: 72 },
-    { month: "Dec", visits: 65 },
-  ]
+export function DoctorStats({ appointments = [] }: { appointments?: any[] }) {
+  // Aggregate visits by month dynamically
+  const monthMap: Record<string, number> = {};
+  appointments.forEach(a => {
+    if (a.appointmentDate) {
+      const date = new Date(a.appointmentDate);
+      if (!isNaN(date.getTime())) {
+        const month = date.toLocaleString('en-US', { month: 'short' });
+        monthMap[month] = (monthMap[month] || 0) + 1;
+      }
+    }
+  });
 
-  // Sample data for patient satisfaction
+  const allMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const patientVisitsData = allMonths.map(month => ({
+    month,
+    visits: monthMap[month] || 0
+  }));
+
+  const totalMonthly = patientVisitsData.reduce((acc, curr) => acc + curr.visits, 0);
+  const avgDaily = (totalMonthly / 30).toFixed(1);
+
+  // Still use sample data for satisfaction since appointments don't contain review scores natively
   const satisfactionData = [
     { month: "Jan", score: 4.2 },
     { month: "Feb", score: 4.3 },
@@ -60,17 +65,17 @@ export function DoctorStats() {
               <CardTitle className="text-sm font-medium">Avg. Daily</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">12.4</div>
-              <p className="text-xs text-muted-foreground">+2.1 from last month</p>
+              <div className="text-2xl font-bold">{avgDaily}</div>
+              <p className="text-xs text-muted-foreground">Based on your dynamic data</p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">Total Monthly</CardTitle>
+              <CardTitle className="text-sm font-medium">Total All Time</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">248</div>
-              <p className="text-xs text-muted-foreground">+42 from last month</p>
+              <div className="text-2xl font-bold">{appointments.length}</div>
+              <p className="text-xs text-muted-foreground">Total appointments booked</p>
             </CardContent>
           </Card>
           <Card>
