@@ -77,10 +77,10 @@ export default function ClinicDashboardPage() {
         <Card className="border shadow-sm">
           <CardContent className="p-6">
             <div className="flex items-center justify-between space-y-0 pb-2">
-              <div className="p-2 bg-green-50 rounded-lg">
-                <Users className="h-6 w-6 text-green-500" />
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <Users className="h-6 w-6 text-primary" />
               </div>
-              <div className="flex items-center text-sm text-green-500 font-medium">
+              <div className="flex items-center text-sm text-primary font-medium">
                 <ArrowUpRight className="mr-1 h-4 w-4" />
                 +0%
               </div>
@@ -96,10 +96,10 @@ export default function ClinicDashboardPage() {
         <Card className="border shadow-sm">
           <CardContent className="p-6">
             <div className="flex items-center justify-between space-y-0 pb-2">
-              <div className="p-2 bg-green-50 rounded-lg">
-                <UserPlus className="h-6 w-6 text-green-500" />
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <UserPlus className="h-6 w-6 text-primary" />
               </div>
-              <div className="flex items-center text-sm text-green-500 font-medium">
+              <div className="flex items-center text-sm text-primary font-medium">
                 <ArrowUpRight className="mr-1 h-4 w-4" />
                 +0%
               </div>
@@ -115,10 +115,10 @@ export default function ClinicDashboardPage() {
         <Card className="border shadow-sm">
           <CardContent className="p-6">
             <div className="flex items-center justify-between space-y-0 pb-2">
-              <div className="p-2 bg-green-50 rounded-lg">
-                <CalendarDays className="h-6 w-6 text-green-500" />
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <CalendarDays className="h-6 w-6 text-primary" />
               </div>
-              <div className="flex items-center text-sm text-green-500 font-medium">
+              <div className="flex items-center text-sm text-primary font-medium">
                 <ArrowUpRight className="mr-1 h-4 w-4" />
                 +0%
               </div>
@@ -134,10 +134,10 @@ export default function ClinicDashboardPage() {
         <Card className="border shadow-sm">
           <CardContent className="p-6">
             <div className="flex items-center justify-between space-y-0 pb-2">
-              <div className="p-2 bg-green-50 rounded-lg">
-                <DollarSign className="h-6 w-6 text-green-500" />
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <DollarSign className="h-6 w-6 text-primary" />
               </div>
-              <div className="flex items-center text-sm text-green-500 font-medium">
+              <div className="flex items-center text-sm text-primary font-medium">
                  <ArrowUpRight className="mr-1 h-4 w-4" />
                  +0%
               </div>
@@ -151,10 +151,10 @@ export default function ClinicDashboardPage() {
       </div>
 
       {/* Chart Section */}
-      <Card className="border-0 shadow-sm bg-white dark:bg-card">
+      <Card className="border-0 shadow-sm bg-card">
         <CardHeader className="pb-2">
           <CardTitle className="flex items-center gap-2 text-lg font-semibold">
-             <ArrowUpRight className="h-5 w-5 text-green-500" />
+             <ArrowUpRight className="h-5 w-5 text-primary" />
              Appointments & Revenue
           </CardTitle>
           <CardDescription>Monthly overview of clinic performance</CardDescription>
@@ -205,14 +205,14 @@ export default function ClinicDashboardPage() {
                 <Bar 
                   dataKey="appointments" 
                   name="Appointments" 
-                  fill="#4ade80" 
+                  fill="hsl(var(--primary))" 
                   radius={[4, 4, 0, 0]} 
                   barSize={40}
                 />
                 <Bar 
                   dataKey="revenue" 
                   name="Revenue" 
-                  fill="#3b82f6" 
+                  fill="hsl(var(--muted-foreground))" 
                   radius={[4, 4, 0, 0]} 
                   barSize={40}
                 />

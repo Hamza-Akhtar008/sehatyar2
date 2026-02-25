@@ -26,32 +26,14 @@ export function UserNav() {
         <DropdownMenuContent className="w-56" align="end" forceMount>
           <DropdownMenuLabel className="font-normal">
             <div className="flex flex-col space-y-1">
-              <p className="text-sm font-medium leading-none capitalize">{user?.role || "User"}</p>
+              <p className="text-sm font-medium leading-none capitalize">{user?.fullName || "Admin"}</p>
               <p className="text-xs leading-none text-muted-foreground">{user?.email}</p>
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
             <DropdownMenuItem asChild>
-              <Link href="/profile" className="flex items-center gap-2 cursor-pointer">
-                <User className="mr-2 h-4 w-4" />
-                <span>Profile</span>
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href="/chat" className="flex items-center gap-2 cursor-pointer">
-                <MessageCircle className="mr-2 h-4 w-4" />
-                <span>Chat</span>
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href="/support" className="flex items-center gap-2 cursor-pointer">
-                <HelpCircle className="mr-2 h-4 w-4" />
-                <span>Support</span>
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href="/settings" className="flex items-center gap-2 cursor-pointer">
+              <Link href="/admin-dashboard/settings" className="flex items-center gap-2 cursor-pointer">
                 <Settings className="mr-2 h-4 w-4" />
                 <span>Settings</span>
               </Link>

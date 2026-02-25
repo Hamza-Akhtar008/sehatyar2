@@ -191,15 +191,15 @@ export function Clinic_Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     //     { title: "Add New Room", href: "/rooms/add" },
     //   ],
     // },
-    {
-      title: "Reviews",
-      href: "/doctor-dashboard/reviews",
-      icon: Star,
-      submenu: [
-        { title: "Doctor Reviews", href: "/clinic-dashboard/reviews/doctors" },
-        { title: "Patient Reviews", href: "/clinic-dashboard/reviews/patients" },
-      ],
-    },
+    // {
+    //   title: "Reviews",
+    //   href: "/doctor-dashboard/reviews",
+    //   icon: Star,
+    //   submenu: [
+    //     { title: "Doctor Reviews", href: "/clinic-dashboard/reviews/doctors" },
+    //     { title: "Patient Reviews", href: "/clinic-dashboard/reviews/patients" },
+    //   ],
+    // },
     // {
     //   title: "Feedback",
     //   href: "/feedback",
@@ -230,11 +230,11 @@ export function Clinic_Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     //   ],
     // },
 
-    {
-      title: "Calendar",
-      href: "/clinic-dashboard/calendar",
-      icon: Calendar1,
-    },
+    // {
+    //   title: "Calendar",
+    //   href: "/clinic-dashboard/calendar",
+    //   icon: Calendar1,
+    // },
     // {
     //   title: "Tasks",
     //   href: "/tasks",
@@ -252,20 +252,20 @@ export function Clinic_Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     //   href: "/email",
     //   icon: Mail,
     // },
-    {
-      title: "Chat",
-      href: "/clinic-dashboard/chat",
-      icon: MessageCircle,
-    },
+    // {
+    //   title: "Chat",
+    //   href: "/clinic-dashboard/chat",
+    //   icon: MessageCircle,
+    // },
      {
       title: "Settings",
       href: "/clinic-dashboard/settings",
       icon: Settings,
       submenu: [
         { title: "General Settings", href: "/clinic-dashboard/settings" },
-        { title: "Notifications", href: "/clinic-dashboard/settings/notifications" },
-        { title: "Working Hours", href: "/clinic-dashboard/settings/hours" },
-        { title: "Integrations", href: "/clinic-dashboard/settings/integrations" },
+        // { title: "Notifications", href: "/clinic-dashboard/settings/notifications" },
+        // { title: "Working Hours", href: "/clinic-dashboard/settings/hours" },
+        // { title: "Integrations", href: "/clinic-dashboard/settings/integrations" },
       ],
     },
     // {
@@ -379,8 +379,7 @@ export function Clinic_Sidebar({ isOpen, setIsOpen }: SidebarProps) {
             <AvatarFallback>SJ</AvatarFallback>
           </Avatar>
           <div className="space-y-0.5">
-            <p className="text-sm font-medium">Dr. Sarah Johnson</p>
-            <p className="text-xs text-muted-foreground">Administrator</p>
+            <p className="text-xs text-muted-foreground">Clinic Admin</p>
           </div>
         </div>
       </div>

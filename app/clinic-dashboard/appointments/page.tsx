@@ -16,6 +16,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar, Check, Clock, Download, Filter, MoreHorizontal, Plus, Search, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { toast } from "sonner";
 type Appointment = {
   id: string;
   patient: {
@@ -30,150 +33,6 @@ type Appointment = {
   duration: string;
   department: string;
 };
-// Initial appointments data
-const initialAppointments: Appointment[] = [
-  {
-    id: "1",
-    patient: {
-      name: "John Smith",
-      image: "/colorful-abstract-shapes.png",
-    },
-    doctor: "Dr. Sarah Johnson",
-    date: "2023-07-15",
-    time: "10:00 AM",
-    status: "Confirmed",
-    type: "Check-up",
-    duration: "30 min",
-    department: "General Medicine",
-  },
-  {
-    id: "2",
-    patient: {
-      name: "Emily Davis",
-      image: "/colorful-abstract-shapes.png",
-    },
-    doctor: "Dr. Michael Chen",
-    date: new Date().toISOString().split("T")[0], // Today's date
-    time: "11:30 AM",
-    status: "In Progress",
-    type: "Consultation",
-    duration: "45 min",
-    department: "Cardiology",
-  },
-  {
-    id: "3",
-    patient: {
-      name: "Robert Wilson",
-      image: "/user-3.png",
-    },
-    doctor: "Dr. Lisa Patel",
-    date: new Date().toISOString().split("T")[0], // Today's date
-    time: "02:15 PM",
-    status: "Completed",
-    type: "Follow-up",
-    duration: "20 min",
-    department: "Orthopedics",
-  },
-  {
-    id: "4",
-    patient: {
-      name: "Jessica Brown",
-      image: "/user-3.png",
-    },
-    doctor: "Dr. James Wilson",
-    date: "2023-07-25", // Future date
-    time: "09:00 AM",
-    status: "Confirmed",
-    type: "Dental Cleaning",
-    duration: "60 min",
-    department: "Dental",
-  },
-  {
-    id: "5",
-    patient: {
-      name: "Michael Johnson",
-      image: "/user-3.png",
-    },
-    doctor: "Dr. Emily Rodriguez",
-    date: "2023-07-28", // Future date
-    time: "10:30 AM",
-    status: "Confirmed",
-    type: "X-Ray",
-    duration: "15 min",
-    department: "Radiology",
-  },
-  {
-    id: "6",
-    patient: {
-      name: "Sarah Thompson",
-      image: "/user-3.png",
-    },
-    doctor: "Dr. Robert Kim",
-    date: "2023-07-10", // Past date
-    time: "01:45 PM",
-    status: "Cancelled",
-    type: "Therapy Session",
-    duration: "45 min",
-    department: "Psychiatry",
-  },
-  {
-    id: "7",
-    patient: {
-      name: "David Miller",
-      image: "/user-3.png",
-    },
-    doctor: "Dr. Jennifer Lee",
-    date: "2023-07-05", // Past date
-    time: "11:00 AM",
-    status: "Completed",
-    type: "Annual Physical",
-    duration: "60 min",
-    department: "General Medicine",
-  },
-  {
-    id: "8",
-    patient: {
-      name: "Amanda Clark",
-      image: "/user-3.png",
-    },
-    doctor: "Dr. Thomas Brown",
-    date: "2023-07-08", // Past date
-    time: "09:30 AM",
-    status: "Cancelled",
-    type: "Vaccination",
-    duration: "15 min",
-    department: "Pediatrics",
-  },
-  {
-    id: "9",
-    patient: {
-      name: "Kevin Martinez",
-      image: "/user-3.png",
-    },
-    doctor: "Dr. Sarah Johnson",
-    date: new Date(new Date().setDate(new Date().getDate() + 3)).toISOString().split("T")[0], // 3 days from now
-    time: "02:00 PM",
-    status: "Confirmed",
-    type: "Check-up",
-    duration: "30 min",
-    department: "General Medicine",
-  },
-  {
-    id: "10",
-    patient: {
-      name: "Sophia Wilson",
-      image: "/user-3.png",
-    },
-    doctor: "Dr. Michael Chen",
-    date: new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split("T")[0], // Tomorrow
-    time: "10:15 AM",
-    status: "Confirmed",
-    type: "Consultation",
-    duration: "45 min",
-    department: "Neurology",
-  },
-];
-
 // Get unique values for filter options
 function getUniqueValues<T>(data: T[], key: keyof T | string): string[] {
   const keyStr = String(key); // Ensure key is treated as a string
@@ -194,8 +53,8 @@ function getUniqueValues<T>(data: T[], key: keyof T | string): string[] {
 export default function AppointmentsPage() {
   const [activeTab, setActiveTab] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
-  const [appointments, setAppointments] = useState(initialAppointments);
-  const [filteredAppointments, setFilteredAppointments] = useState(initialAppointments);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [filteredAppointments, setFilteredAppointments] = useState<Appointment[]>([]);
   const [filters, setFilters] = useState<any>({
     status: [],
     type: [],
@@ -204,17 +63,150 @@ export default function AppointmentsPage() {
     duration: [],
   });
   const [isFiltersApplied, setIsFiltersApplied] = useState(false);
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  
+  const [isAddOpen, setIsAddOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    patientName: "",
+    phoneNumber: "",
+    email: "",
+    paymentMethod: "cash",
+    amount: 0,
+    notes: "",
+    appointmentDate: new Date().toISOString().split("T")[0],
+    appointmentTime: "10:00",
+    appointmentFor: "myself",
+    doctorId: 0,
+    userId: 0, // In reality, fetch from context, but exposing as requested
+    prescriptionFile: "",
+    appointmentType: "Check-up",
+    status: "Confirmed"
+  });
 
-  // Get unique values for filter options
+  const fetchAppointments = async () => {
+    try {
+      const token = localStorage.getItem("access_token");
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}appointments/by/clinic`, {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          const mapped = data.map((item: any) => ({
+             id: item.id?.toString(),
+             patient: {
+                name: item.patientName || item.patient?.user?.fullName || "Unknown",
+                image: item.patient?.profilePic || "/user-2.png"
+             },
+             doctor: item.doctor?.user?.fullName ? `Dr. ${item.doctor.user.fullName}` : "Unknown Doctor",
+             date: item.appointmentDate ? item.appointmentDate.split("T")[0] : new Date().toISOString().split("T")[0],
+             time: item.appointmentTime || "10:00 AM",
+             status: item.status || "Pending",
+             type: item.appointmentType || "Visit",
+             duration: "30 min",
+             department: item.doctor?.primarySpecialization?.[0] || "General"
+          }));
+          setAppointments(mapped);
+          setFilteredAppointments(mapped);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to fetch appointments:", err);
+    }
+  };
+
+  const [doctors, setDoctors] = useState<any[]>([]);
+
+  const fetchDoctors = async () => {
+    try {
+      const token = localStorage.getItem("access_token");
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}doctor-profile/by/clinic`, {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setDoctors(Array.isArray(data) ? data : []);
+      }
+    } catch (err) {
+      console.error("Failed to fetch doctors:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchAppointments();
+    fetchDoctors();
+  }, []);
+
+  const handleAddAppointment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem("access_token");
+      
+      const payload = {
+        patientName: formData.patientName,
+        phoneNumber: formData.phoneNumber,
+        email: formData.email,
+        paymentMethod: formData.paymentMethod,
+        amount: formData.amount.toString(),
+        notes: formData.notes,
+        appointmentDate: formData.appointmentDate,
+        appointmentTime: formData.appointmentTime,
+        appointmentFor: formData.appointmentFor,
+        doctorId: Number(formData.doctorId) || 0,
+      };
+      
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}appointments/by/clinic`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+      
+      if (res.ok) {
+         toast.success("Appointment successfully created!");
+         setFormData({
+           patientName: "",
+           phoneNumber: "",
+           email: "",
+           paymentMethod: "cash",
+           amount: 0,
+           notes: "",
+           appointmentDate: new Date().toISOString().split("T")[0],
+           appointmentTime: "10:00",
+           appointmentFor: "myself",
+           doctorId: 0,
+           userId: 0,
+           prescriptionFile: "",
+           appointmentType: "Check-up",
+           status: "Confirmed"
+         });
+         setIsAddOpen(false);
+         fetchAppointments(); 
+      } else {
+         const errData = await res.json();
+         toast.error(errData.message || "Failed to create appointment.");
+      }
+    } catch(err) {
+      toast.error("Error creating appointment. Please check your network.");
+    }
+  };
+
+  // Get unique values for filter options dynamically off fetched data
   const statusOptions = getUniqueValues(appointments, "status");
   const typeOptions = getUniqueValues(appointments, "type");
   const doctorOptions = getUniqueValues(appointments, "doctor");
   const departmentOptions = getUniqueValues(appointments, "department");
   const durationOptions = getUniqueValues(appointments, "duration");
-  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+
   // Apply filters and search
   useEffect(() => {
-    let result = [...initialAppointments];
+    let result = [...appointments];
 
     // Apply tab filter first
     if (activeTab === "upcoming") {
@@ -325,14 +317,89 @@ export default function AppointmentsPage() {
             <p className="text-muted-foreground">Manage your clinic's appointments and schedules.</p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <Button variant="outline" href="/appointments/calendar">
-              <Calendar className="mr-2 h-4 w-4" />
-              Calendar View
+            <Button variant="outline" asChild>
+              <Link href="/clinic-dashboard/appointments/calendar">
+                <Calendar className="mr-2 h-4 w-4" />
+                Calendar View
+              </Link>
             </Button>
-            <Button href="/appointments/add">
-              <Plus className="mr-2 h-4 w-4" />
-              New Appointment
-            </Button>
+            
+            <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="mr-2 h-4 w-4" />
+                  New Appointment
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Add New Appointment</DialogTitle>
+                  <DialogDescription>Quickly add an appointment using the required payload.</DialogDescription>
+                </DialogHeader>
+                <form onSubmit={handleAddAppointment} className="space-y-4 py-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Patient Name</Label>
+                      <Input required value={formData.patientName} onChange={(e) => setFormData({...formData, patientName: e.target.value})} placeholder="John Doe" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Phone Number</Label>
+                      <Input required value={formData.phoneNumber} onChange={(e) => setFormData({...formData, phoneNumber: e.target.value})} placeholder="+1234567890" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Email</Label>
+                      <Input required type="email" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} placeholder="john@example.com" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Payment Method</Label>
+                      <Input value={formData.paymentMethod} onChange={(e) => setFormData({...formData, paymentMethod: e.target.value})} placeholder="cash" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Amount</Label>
+                      <Input type="number" required value={formData.amount} onChange={(e) => setFormData({...formData, amount: Number(e.target.value)})} placeholder="0" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Date</Label>
+                      <Input type="date" required value={formData.appointmentDate} onChange={(e) => setFormData({...formData, appointmentDate: e.target.value})} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Time</Label>
+                      <Input type="time" required value={formData.appointmentTime} onChange={(e) => setFormData({...formData, appointmentTime: e.target.value})} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Type</Label>
+                      <Input value={formData.appointmentType} onChange={(e) => setFormData({...formData, appointmentType: e.target.value})} placeholder="Check-up" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Doctor</Label>
+                      <Select 
+                        value={formData.doctorId ? formData.doctorId.toString() : ""} 
+                        onValueChange={(val) => setFormData({...formData, doctorId: Number(val)})}
+                      >
+                         <SelectTrigger>
+                           <SelectValue placeholder="Select Doctor" />
+                         </SelectTrigger>
+                         <SelectContent>
+                           {doctors.map((doc: any) => (
+                             <SelectItem key={doc.id} value={doc.id?.toString()}>
+                               {doc.user?.fullName ? `Dr. ${doc.user?.fullName}` : `Doctor #${doc.id}`}
+                             </SelectItem>
+                           ))}
+                         </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Notes</Label>
+                    <Input value={formData.notes} onChange={(e) => setFormData({...formData, notes: e.target.value})} placeholder="Add notes here..." />
+                  </div>
+                  <DialogFooter>
+                    <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)}>Cancel</Button>
+                    <Button type="submit">Create Appointment</Button>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
 

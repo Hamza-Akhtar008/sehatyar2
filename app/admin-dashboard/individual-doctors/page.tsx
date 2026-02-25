@@ -118,7 +118,7 @@ export default function DoctorsPage() {
             <p className="text-muted-foreground">Manage your medical staff and their information.</p>
           </div>
           <Button asChild>
-            <Link href="/doctors/add">
+            <Link href="/admin-dashboard/individual-doctors/add">
               <Plus className="mr-2 h-4 w-4" />
               Add Doctor
             </Link>

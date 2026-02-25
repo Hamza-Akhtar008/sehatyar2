@@ -13,6 +13,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type React from "react";
 import { useEffect, useState } from "react";
+import { useAuth } from "@/context/AuthContext";
 import AnimateHeight from "react-animate-height";
 interface SidebarProps {
   isOpen: boolean;
@@ -29,6 +30,7 @@ interface SidebarItem {
 export function Admin_Sidebar({ isOpen, setIsOpen }: SidebarProps) {
   const pathname = usePathname();
   const isMobile = useMobile();
+  const { user } = useAuth();
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
   const { theme, setTheme } = useTheme();
   const sidebarItems: SidebarItem[] = [
@@ -188,41 +190,41 @@ export function Admin_Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     //     { title: "Add New Room", href: "/rooms/add" },
     //   ],
     // },
-    {
-      title: "Reviews",
-      href: "/admin-dashboard/reviews",
-      icon: Star,
-      submenu: [
-        { title: "Doctor Reviews", href: "/admin-dashboard/reviews/doctors" },
-        { title: "Patient Reviews", href: "/admin-dashboard/reviews/patients" },
-      ],
-    },
+    // {
+    //   title: "Reviews",
+    //   href: "/admin-dashboard/reviews",
+    //   icon: Star,
+    //   submenu: [
+    //     { title: "Doctor Reviews", href: "/admin-dashboard/reviews/doctors" },
+    //     { title: "Patient Reviews", href: "/admin-dashboard/reviews/patients" },
+    //   ],
+    // },
     // {
     //   title: "Feedback",
     //   href: "/feedback",
     //   icon: MessageSquare,
     // },
-    {
-      title: "Reports",
-      href: "/admin-dashboard/reports",
-      icon: BarChart3,
-      submenu: [
-        { title: "Overview", href: "/admin-dashboard/reports" },
-        { title: "Appointment Reports", href: "/admin-dashboard/reports/appointments" },
-        { title: "Financial Reports", href: "/admin-dashboard/reports/financial" },
-        // { title: "Inventory Reports", href: "/reports/inventory" },
-        { title: "Patient Visit Reports", href: "/admin-dashboard/reports/patients" },
-      ],
-    },
+    // {
+    //   title: "Reports",
+    //   href: "/admin-dashboard/reports",
+    //   icon: BarChart3,
+    //   submenu: [
+    //     { title: "Overview", href: "/admin-dashboard/reports" },
+    //     { title: "Appointment Reports", href: "/admin-dashboard/reports/appointments" },
+    //     { title: "Financial Reports", href: "/admin-dashboard/reports/financial" },
+    //     // { title: "Inventory Reports", href: "/reports/inventory" },
+    //     { title: "Patient Visit Reports", href: "/admin-dashboard/reports/patients" },
+    //   ],
+    // },
     {
       title: "Settings",
       href: "/admin-dashboard/settings",
       icon: Settings,
       submenu: [
         { title: "General Settings", href: "/admin-dashboard/settings" },
-        { title: "Notifications", href: "/admin-dashboard/settings/notifications" },
-        { title: "Working Hours", href: "/admin-dashboard/settings/hours" },
-        { title: "Integrations", href: "/admin-dashboard/settings/integrations" },
+        // { title: "Notifications", href: "/admin-dashboard/settings/notifications" },
+        // { title: "Working Hours", href: "/admin-dashboard/settings/hours" },
+        // { title: "Integrations", href: "/admin-dashboard/settings/integrations" },
       ],
     },
     // {
@@ -237,31 +239,31 @@ export function Admin_Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     //   ],
     // },
 
-    {
-      title: "Calendar",
-      href: "/admin-dashboard/calendar",
-      icon: Calendar1,
-    },
+    // {
+    //   title: "Calendar",
+    //   href: "/admin-dashboard/calendar",
+    //   icon: Calendar1,
+    // },
     // {
     //   title: "Tasks",
     //   href: "/tasks",
     //   icon: CheckCircle2,
     // },
-    {
-      title: "Contacts",
-      href: "/admin-dashboard/contact",
-      icon: UserRound,
-    },
+    // {
+    //   title: "Contacts",
+    //   href: "/admin-dashboard/contact",
+    //   icon: UserRound,
+    // },
     // {
     //   title: "Email",
     //   href: "/email",
     //   icon: Mail,
     // },
-    {
-      title: "Chat",
-      href: "/admin-dashboard/chat",
-      icon: MessageCircle,
-    },
+    // {
+    //   title: "Chat",
+    //   href: "/admin-dashboard/chat",
+    //   icon: MessageCircle,
+    // },
     // {
     //   title: "Support",
     //   href: "/support",
@@ -369,12 +371,12 @@ export function Admin_Sidebar({ isOpen, setIsOpen }: SidebarProps) {
       <div className="border-t p-4 shrink-0">
         <div className="flex items-center gap-3">
           <Avatar className="h-8 w-8">
-            <AvatarImage src="/placeholder-user.jpg" alt="Dr. Sarah Johnson" />
-            <AvatarFallback>SJ</AvatarFallback>
+            <AvatarImage src={(user as any)?.profilePic || ""} alt={user?.fullName || "Admin"} />
+            <AvatarFallback>{user?.fullName ? user.fullName.substring(0, 2).toUpperCase() : "AD"}</AvatarFallback>
           </Avatar>
           <div className="space-y-0.5">
-            <p className="text-sm font-medium">Dr. Sarah Johnson</p>
-            <p className="text-xs text-muted-foreground">Administrator</p>
+            <p className="text-sm font-medium">{user?.fullName || "Admin"}</p>
+            <p className="text-xs text-muted-foreground capitalize">{user?.role || "Administrator"}</p>
           </div>
         </div>
       </div>
