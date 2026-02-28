@@ -234,9 +234,9 @@ export function Patient_Sidebar({ isOpen, setIsOpen }: SidebarProps) {
       icon: Settings,
       submenu: [
         { title: "General Settings", href: "/patient-dashboard/settings" },
-        { title: "Notifications", href: "/patient-dashboard/settings/notifications" },
-        { title: "Working Hours", href: "/patient-dashboard/settings/hours" },
-        { title: "Integrations", href: "/patient-dashboard/settings/integrations" },
+        // { title: "Notifications", href: "/patient-dashboard/settings/notifications" },
+        // { title: "Working Hours", href: "/patient-dashboard/settings/hours" },
+        // { title: "Integrations", href: "/patient-dashboard/settings/integrations" },
       ],
     },
     // {

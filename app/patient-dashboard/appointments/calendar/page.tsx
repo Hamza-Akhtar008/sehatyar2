@@ -48,18 +48,18 @@ const getStatusBadge = (status: any) => {
   }
 };
 
-const getBadgeColor = (status: string) => {
+const getBadgeStyles = (status: string) => {
    switch (status) {
     case "Confirmed":
-      return "blue";
+      return "bg-blue-500/10 border-blue-300 text-blue-700 dark:text-blue-400";
     case "In Progress":
-      return "amber";
+      return "bg-amber-500/10 border-amber-300 text-amber-700 dark:text-amber-400";
     case "Completed":
-      return "green";
+      return "bg-green-500/10 border-green-300 text-green-700 dark:text-green-400";
     case "Cancelled":
-      return "red";
+      return "bg-red-500/10 border-red-300 text-red-700 dark:text-red-400";
     default:
-      return "gray";
+      return "bg-gray-500/10 border-gray-300 text-gray-700 dark:text-gray-400";
   }
 }
 
@@ -72,14 +72,20 @@ export default function CalendarPage() {
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
-        const userStr = localStorage.getItem("user_data");
+        const userStr = localStorage.getItem("user_data") || localStorage.getItem("user");
         if (!userStr) return;
 
         const user = JSON.parse(userStr);
         if (user && user.id) {
           const data = await getAppointmentsByPatientId(user.id);
           const mappedAppointments = data.map((item: any) => {
-              const appointmentDate = new Date(item.appointmentDate);
+              // Ensure consistent date parsing
+              let appointmentDate = new Date();
+              if (item.appointmentDate) {
+                const datePart = item.appointmentDate.split("T")[0];
+                appointmentDate = new Date(datePart);
+                appointmentDate.setHours(0, 0, 0, 0);
+              }
               const status = item.status ? item.status.charAt(0).toUpperCase() + item.status.slice(1) : "Pending";
             return {
             id: item.id.toString(),
@@ -95,7 +101,7 @@ export default function CalendarPage() {
             type: item.appointmentType || "Consultation",
             duration: 30, // Default duration
             department: item.doctor?.primarySpecialization?.[0] || "General",
-            color: getBadgeColor(status),
+            style: getBadgeStyles(status),
           }});
           setAppointments(mappedAppointments);
         }
@@ -235,25 +241,24 @@ export default function CalendarPage() {
                       return appTime.startsWith(timeSlot.split(':')[0]) && appTime.endsWith(slotAmPm);
                   })
                   .map((appointment) => (
-                    <div key={appointment.id} className={`p-2 mb-1 rounded-md bg-${appointment.color}-500/10 border border-${appointment.color}-300`}>
+                    <div key={appointment.id} className={`p-2 mb-1 rounded-md border ${appointment.style}`}>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center">
                           <Avatar className="h-6 w-6 mr-2">
-                            <AvatarImage src={appointment.patient.image || "/user-2.png"} alt={appointment.patient.name} />
-                            <AvatarFallback>{appointment.patient.name.charAt(0)}</AvatarFallback>
+                            <AvatarImage src={"/placeholder-user.jpg"} alt={appointment.doctor} />
+                            <AvatarFallback>{appointment.doctor.charAt(0)}</AvatarFallback>
                           </Avatar>
-                          <span className="font-medium text-sm">{appointment.patient.name}</span>
+                          <span className="font-medium text-sm">{appointment.doctor}</span>
                         </div>
                         {getStatusBadge(appointment.status)}
                       </div>
-                      <div className="mt-1 text-xs text-muted-foreground max-sm:hidden">
+                      <div className="mt-1 text-xs text-muted-foreground/80 max-sm:hidden">
                         <div className="flex justify-between">
                           <span>
                             {appointment.time} - {appointment.endTime}
                           </span>
                           <span>{appointment.type}</span>
                         </div>
-                        <div>{appointment.doctor}</div>
                       </div>
                     </div>
                   ))}
@@ -300,14 +305,13 @@ export default function CalendarPage() {
               ) : (
                 <div className="space-y-2">
                   {dayAppointments.map((appointment) => (
-                    <div key={appointment.id} className={`md:p-2 rounded-md bg-${appointment.color}-500/10 border border-${appointment.color}-300`}>
+                    <div key={appointment.id} className={`md:p-2 rounded-md border ${appointment.style}`}>
                       <div className="flex items-center justify-between">
-                        <span className="font-medium text-xs md:text-sm">{appointment.patient.name}</span>
-                        <span className="text-xs max-md:hidden">{appointment.time}</span>
+                        <span className="font-medium text-xs md:text-sm truncate mr-2">{appointment.doctor}</span>
+                        <span className="text-xs max-md:hidden whitespace-nowrap">{appointment.time}</span>
                       </div>
-                      <div className="mt-1 text-xs text-muted-foreground max-md:hidden">
-                        <div>{appointment.type}</div>
-                        <div>{appointment.doctor}</div>
+                      <div className="mt-1 text-xs text-muted-foreground/80 max-md:hidden">
+                        <div className="truncate">{appointment.type}</div>
                       </div>
                     </div>
                   ))}
@@ -371,8 +375,8 @@ export default function CalendarPage() {
                     <div className={`text-right text-xs md:text-sm font-medium mb-1 ${isToday ? "text-primary" : ""}`}>{day}</div>
                     <div className="space-y-1">
                       {dayAppointments.slice(0, 3).map((appointment) => (
-                        <div key={appointment.id} className={`p-1 rounded text-xs bg-${appointment.color}-500/10 dark:border border-neutral-500 truncate`}>
-                          {appointment.time} - {appointment.patient.name}
+                        <div key={appointment.id} className={`p-1 border rounded text-xs truncate ${appointment.style}`}>
+                          {appointment.time} - {appointment.doctor}
                         </div>
                       ))}
                       {dayAppointments.length > 3 && <div className="text-xs text-center text-muted-foreground">+{dayAppointments.length - 3} more</div>}
@@ -438,10 +442,10 @@ export default function CalendarPage() {
                   {/* We could dynamically populate this list from unique doctors in appointments */}
                 </SelectContent>
               </Select>
-              <Button href="/patient-dashboard/appointments/add">
+              {/* <Button href="/patient-dashboard/appointments/add">
                 <Plus className="h-4 w-4 mr-2" />
                 New
-              </Button>
+              </Button> */}
             </div>
           </div>
 

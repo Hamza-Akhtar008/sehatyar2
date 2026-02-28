@@ -219,14 +219,14 @@ export default function AppointmentsPage() {
             <p className="text-muted-foreground">Manage your clinic's appointments and schedules.</p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <Button variant="outline" href="/appointments/calendar">
+            <Button variant="outline" href="/patient-dashboard/appointments/calendar">
               <Calendar className="mr-2 h-4 w-4" />
               Calendar View
             </Button>
-            <Button href="/appointments/add">
+            {/* <Button href="/appointments/add">
               <Plus className="mr-2 h-4 w-4" />
               New Appointment
-            </Button>
+            </Button> */}
           </div>
         </div>
 
